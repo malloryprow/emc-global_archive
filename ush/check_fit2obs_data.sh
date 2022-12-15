@@ -6,6 +6,7 @@ set -x
 # checks the archived fit-to-obs data.
 # Command line agruments:
 #       1 - PDY, in form of YYYYmmdd
+#       2 - cyc, in form of HH
 ##################################################
 
 # Command line arguments

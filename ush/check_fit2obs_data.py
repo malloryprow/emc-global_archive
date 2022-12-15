@@ -138,9 +138,9 @@ for env_var_name in list(env_var_dict.keys()):
               +env_var_value)
     run_settings_dict[env_var_name] = env_var_value
 
-#print("Using run settings...")
-#for run_name in list(run_settings_dict.keys()):
-#    print(run_name+' = '+str(run_settings_dict[run_name]))
+print("\nUsing run settings...")
+for run_name in list(run_settings_dict.keys()):
+    print(run_name+' = '+str(run_settings_dict[run_name]))
 print("")
 
 # Check fit-to-obs data

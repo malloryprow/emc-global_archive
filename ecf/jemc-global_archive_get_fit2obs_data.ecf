@@ -10,7 +10,7 @@
 
 set -x
 
-#cd $PBS_O_WORKDIR
+cd $PBS_O_WORKDIR
 
 export model=emc_global_archive
 

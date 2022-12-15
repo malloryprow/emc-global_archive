@@ -146,6 +146,8 @@ def copy_file(src, dest):
         if os.stat(src).st_size != 0:
             print("--- COPYING "+src+" TO "+dest)
             shutil.copy2(src, dest)
+    else:
+        print("--- "+src+" DOES NOT EXIST")
     if os.path.exists(dest):
         if os.stat(dest).st_size == 0:
             print("--- SIZE 0, REMOVING "+dest)

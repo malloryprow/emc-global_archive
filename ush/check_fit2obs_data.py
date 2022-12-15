@@ -146,6 +146,7 @@ print("")
 # Check fit-to-obs data
 run_dir = os.path.join(run_settings_dict['RUN_DIR'])
 if not os.path.exists(run_dir):
+    print("Making directory "+run_dir)
     os.makedirs(run_dir)
 os.chdir(run_dir)
 print("In run directory: "+run_dir)

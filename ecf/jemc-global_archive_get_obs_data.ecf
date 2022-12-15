@@ -1,0 +1,49 @@
+#PBS -N jemc_global_archive_get_obs_data
+#PBS -j oe
+#PBS -S /bin/bash
+#PBS -q dev_transfer
+#PBS -A VERF-DEV
+#PBS -l walltime=04:00:00
+#PBS -l place=shared,select=1:ncpus=1
+#PBS -l debug=true
+#PBS -V
+
+set -x
+
+cd $PBS_O_WORKDIR
+
+export model=emc_global_archive
+
+export HOMEemc_global_archive=$(eval "cd ../;pwd")
+versionfile=$HOMEemc_global_archive/versions/run.ver
+. $versionfile
+
+module reset
+module load prod_util/${prod_util_ver}
+module load prod_envir/${prod_envir_ver}
+module load intel/${intel_ver}
+module load python/${python_ver}
+module load cdo/${cdo_ver}
+module load gsl/${gsl_ver}
+module load udunits/${udunits_ver}
+module load nco/${nco_ver}
+
+export cyc=00
+export DATAROOT=/lfs/h2/emc/ptmp/$USER/output_crons
+export job=${PBS_JOBNAME:-jemc_global_archive_get_obs_data}
+export jobid=$job.${PBS_JOBID:-$$}
+export TMPDIR=$DATAROOT
+export NET=jemc_global_archive
+export RUN=get_obs_data
+export ARCHOUT=/lfs/h2/emc/vpppg/noscrub/$USER/archive
+export SENDARCH=YES
+export KEEPDATA=YES
+
+export IDATE=$(date '+%Y%m%d')
+
+export obs_list="prepbufr_gdas prepbufr_nam prepbufr_rap ccpa_accum24hr ccpa_accum6hr nohrsc_accum24hr get_d osi_saf ghrsst_median OBSPRCP"
+
+$HOMEemc_global_archive/jobs/JEMC_GLOBAL_ARCHIVE_GET_OBS_DATA
+######################################################################
+# Purpose: This does the daily observation archiving for emc-global_archive 
+######################################################################

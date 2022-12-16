@@ -136,7 +136,7 @@ for run_name in list(run_settings_dict.keys()):
 print("")
 
 # Check obs data
-if run_settings_dict['OBS'] in ['prepbufr_gdas', 'prepbufr_nam']:
+if run_settings_dict['OBS'] in ['prepbufr_gdas', 'prepbufr_nam', 'prepbufr_rap']:
     obs_archive_dir = os.path.join(
         run_settings_dict['ARCHIVE_DIR'],
         run_settings_dict['OBS'].split('_')[0],
@@ -225,8 +225,8 @@ if os.path.exists(obs_archive_dir):
         check_file_list.append('GETDL3_DAL_CONUS_'+PDY_dt.strftime('%Y%j')
                                +'_1.0.nc')
     elif run_settings_dict['OBS'] == 'osi_saf':
-        PDYm1_dt = PDY - datetime.timedelta(days=1)
-        PDYm7_dt = PDY - datetime.timedelta(days=7)
+        PDYm1_dt = PDY_dt - datetime.timedelta(days=1)
+        PDYm7_dt = PDY_dt - datetime.timedelta(days=7)
         check_file_list.append('osi_saf.multi.'
                                +PDYm1_dt.strftime('%Y%m%d')+'00to'
                                +run_settings_dict['PDY']+'00_G004.nc')
@@ -234,7 +234,7 @@ if os.path.exists(obs_archive_dir):
                                +PDYm7_dt.strftime('%Y%m%d')+'00to'
                                +run_settings_dict['PDY']+'00_G004.nc')
     elif run_settings_dict['OBS'] == 'ghrsst_median':
-        PDYm1_dt = PDY - datetime.timedelta(days=1)
+        PDYm1_dt = PDY_dt - datetime.timedelta(days=1)
         check_file_list.append('UKMO-L4_GHRSST-SSTfnd-GMPE-GLOB_valid'
                                +PDYm1_dt.strftime('%Y%m%d')+'00to'
                                +run_settings_dict['PDY']+'00.nc')

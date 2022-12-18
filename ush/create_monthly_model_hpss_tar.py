@@ -151,6 +151,13 @@ model_hpss_dir = os.path.join(
 ega_util.run_shell_command(
     ['hsi', '"mkdir -p '+model_hpss_dir+'"']
 )
+if run_settings_dict['MODEL'] in ['ecm', 'ecmg4']:
+    ega_util.run_shell_command(
+        ['hsi', '"chmod 750 '+model_hpss_dir+'"']
+    )
+    ega_util.run_shell_command(
+        ['hsi', '"chgrp rstprod '+model_hpss_dir+'"']
+    )
 model_archive_dir = os.path.join(
     run_settings_dict['ARCHIVE_DIR'], run_settings_dict['MODEL']
 )
@@ -171,6 +178,19 @@ if nYEARMON_files != 0:
                       +run_settings_dict['YEARMON']+'.tar'),
          '*'+run_settings_dict['YEARMON']+'*'+run_settings_dict['CYCLE']]
     )
+    if run_settings_dict['MODEL'] in ['ecm', 'ecmg4']:
+        ega_util.run_shell_command(
+            ['hsi', '"chmod 750 '
+             +os.path.join(model_hpss_dir, run_settings_dict['MODEL']
+                           +run_settings_dict['CYCLE']+'_'
+                           +run_settings_dict['YEARMON']+'.tar')+'"']
+        )
+        ega_util.run_shell_command(
+            ['hsi', '"chgrp rstprod '
+             +os.path.join(model_hpss_dir, run_settings_dict['MODEL']
+                           +run_settings_dict['CYCLE']+'_'
+                           +run_settings_dict['YEARMON']+'.tar')+'"']
+        )
 else:
     print("No files for "+run_settings_dict['YEARMON']+" in "
           +model_archive_dir)

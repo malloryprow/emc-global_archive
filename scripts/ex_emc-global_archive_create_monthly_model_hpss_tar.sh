@@ -20,6 +20,7 @@ for model in $model_list; do
     if [ $model = "ncmrwf" ]; then cycles="00 12";       fi
     if [ $model = "ukm" ];    then cycles="00 12";       fi
     for cycle in $cycles ; do
+        cd $DATA
         python ${USHemc_global_archive}/create_monthly_model_hpss_tar.py --yearmon=${TAR_YYYY}${TAR_mm} --archdir=$ARCHINmodel --hpssdir=$HPSSmodel --model=$model --cycle=$cycle
     done
 done

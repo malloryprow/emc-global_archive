@@ -1,0 +1,82 @@
+#!/bin/bash
+
+########################################
+# Preliminary data setup step
+########################################
+set -xa
+
+####################################
+# SET SHELL PROCESSING VARIABLES
+####################################
+export PS4='$SECONDS + '
+date
+
+###########################################################
+# obtain unique LSF id (jobid) and make temp directories
+###########################################################
+export pid=$$
+export DATA=${DATA:-${DATAROOT:?}/${jobid:?}}
+mkdir -p $DATA
+cd $DATA
+
+####################################
+# Determine Job Output Name on System
+####################################
+export pgmout="OUTPUT.${pid}"
+
+####################################
+# Set emc-global_archive directories
+####################################
+export HOMEemc_global_archive=${HOMEemc_global_archive:-${PACKAGEROOT}/emc_global_archive.${model_ver}}
+export EXECemc_global_archive=${EXECemc_global_archive:-$HOMEemc_global_archive/exec}
+export FIXemc_global_archive=${FIXemc_global_archive:-$HOMEemc_global_archive/fix}
+export PARMemc_global_archive=${PARMemc_global_archive:-$HOMEemc_global_archive/parm}
+export USHemc_global_archive=${USHemc_global_archive:-$HOMEemc_global_archive/ush}
+
+####################################
+# Run setpdy and initialize PDY variables
+####################################
+export cycle=${cycle:-t${cyc}z}
+setpdy.sh
+. ./PDY
+export TAR_YYYY=${TAR_YYYY:-`echo $PDYm5 | cut -c1-4`}
+export TAR_mm=${TAR_mm:-`echo $PDYm5 | cut -c5-6`}
+
+####################################
+# Define NET/RUN variables
+####################################
+export NET=${NET:-jemc_global_archive}
+export RUN=${RUN:-create_monthly_model_hpss_tar}
+
+####################################
+# Define model variables
+####################################
+export model_list=${model_list:-"gfs"}
+
+####################################
+# Define ARCHIN/HPSSmodel variables
+####################################
+export ARCHIN=${ARCHIN:-/lfs/h2/emc/vpppg/noscrub/$USER/archive}
+export ARCHINmodel=$ARCHIN/model_data
+export HPSSmodel=${HPSSmodel:-/NCEPDEV/emc-global/5year/$USER/model_data}
+
+#######################################################################
+# Execute the script
+#######################################################################
+env
+
+$HOMEemc_global_archive/scripts/ex_emc-global_archive_create_monthly_model_hpss_tar.sh
+export err=$?; err_chk
+
+cat $pgmout
+
+msg="JOB $job HAS COMPLETED NORMALLY."
+postmsg "$jlogfile" "$msg"
+
+KEEPDATA=${KEEPDATA:-NO}
+if [ "$KEEPDATA" != "YES" ] ; then
+  cd $DATAROOT
+  rm -rf $DATA
+fi
+
+date

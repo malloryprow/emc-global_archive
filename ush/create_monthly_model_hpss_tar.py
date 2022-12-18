@@ -107,10 +107,10 @@ for cmd_line_arg_name in list(cmd_line_args_dict.keys()):
     if any(cmd_line_arg_name in arg for arg in sys.argv[1:]):
         for arg in sys.argv[1:]:
             if cmd_line_arg_name in arg:
-                if cmd_line_arg_name == '--date=':
-                    if len(arg.replace('--date=','')) != 6:
-                        print("--date must be in YYYYmm format, got "
-                              +arg.replace('--date=',''))
+                if cmd_line_arg_name == '--yearmon=':
+                    if len(arg.replace('--yearmon=','')) != 6:
+                        print("--yearmon must be in YYYYmm format, got "
+                              +arg.replace('--yearmon=',''))
                         sys.exit(1)
                 print(cmd_line_arg_name+" passed, using  "
                       +arg.replace(cmd_line_arg_name, ''))

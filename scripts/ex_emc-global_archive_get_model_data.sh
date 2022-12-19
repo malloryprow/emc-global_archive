@@ -6,7 +6,6 @@ set -x
 # to archive data from various global models.
 ##################################################
 
-cd $DATA
 for model in $model_list; do
     if [ $model = "cdas" ];   then cycles="00";          fhrmin=0; fhrmax=384; fhrinc=24; fi
     if [ $model = "cfsr" ];   then cycles="00";          fhrmin=0; fhrmax=384; fhrinc=24; fi
@@ -22,6 +21,7 @@ for model in $model_list; do
     if [ $model = "ncmrwf" ]; then cycles="00 12";       fhrmin=0; fhrmax=240; fhrinc=12; fi
     if [ $model = "ukm" ];    then cycles="00 12";       fhrmin=0; fhrmax=144; fhrinc=12; fi
     for cycle in $cycles ; do
+        cd $DATA
         python ${USHemc_global_archive}/get_model_data.py --date=$IDATE --archdir=$ARCHOUTmodel --rundir=$DATA --model=$model --cycle=$cycle --fhrmin=$fhrmin --fhrmax=$fhrmax --fhrinc=$fhrinc
     done
 done

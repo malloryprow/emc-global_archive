@@ -6,6 +6,7 @@ set -x
 ##################################################
 
 for dir in model_data obs_data fit2obs_data; do
+    cd $DATA
     python ${USHemc_global_archive}/rsync_archive.py --archdir=$ARCHIN/$dir
 done
 

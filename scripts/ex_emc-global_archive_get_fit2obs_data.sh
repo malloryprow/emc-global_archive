@@ -6,7 +6,7 @@ set -x
 # to archive the fit-to-obs data.
 ##################################################
 
-cd $DATA
 for model in $fit2obs_model_list; do
+    cd $DATA
     python ${USHemc_global_archive}/get_fit2obs_data.py --date=$IDATE --archdir=$ARCHOUTfit2obs --rundir=$DATA --model=$model
 done

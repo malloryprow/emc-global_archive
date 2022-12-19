@@ -6,7 +6,7 @@ set -x
 # to archive the observation data.
 ##################################################
 
-cd $DATA
 for obs in $obs_list; do
+    cd $DATA
     python ${USHemc_global_archive}/get_obs_data.py --date=$IDATE --archdir=$ARCHOUTobs --rundir=$DATA --obs=$obs
 done

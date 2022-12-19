@@ -1,0 +1,93 @@
+#!/bin/sh
+set -x
+
+source ../versions/build.ver
+module purge
+module load envvar/${envvar_ver}
+module load intel/${intel_ver}
+module load bacio/${bacio_ver}
+module load w3emc/${w3emc_ver}
+
+FCMP=ifort
+export LIBDIRW3EMC=${w3emc_ROOT}/lib64
+export W3LIB=w3emc_4
+export LIBDIRBACIO=${bacio_ROOT}/lib
+export BACIOLIB=bacio_4          
+export FFLAGS="-O2 -convert big_endian -traceback -mkl -free"
+
+mkdir -p ../exec
+
+#-------------------
+cat >makefile <<EOF
+FOPTS=${FFLAGS}
+FC=${FCMP}
+BINDIR= ../exec
+LIBS=-L${LIBDIRW3EMC} -l${W3LIB}  -L${LIBDIRBACIO} -l${BACIOLIB}
+SRCS=ecm_gfs_look_alike_new.f90           
+CMD=ecm_gfs_look_alike_new
+\$(CMD): \$(SRCS)
+	 \$(FC) \$(FOPTS) \$(SRCS) \$(LIBS) -o \$(CMD)
+install:
+	-mv \$(CMD) \${BINDIR}/
+EOF
+make
+make install
+rm makefile 
+#-------------------
+
+#-------------------
+cat >makefile <<EOF
+FOPTS=${FFLAGS}
+FC=${FCMP}
+BINDIR= ../exec
+LIBS=-L${LIBDIRW3EMC} -l${W3LIB}  -L${LIBDIRBACIO}  -l${BACIOLIB}
+SRCS=   jma_merge.f 
+CMD=jma_merge
+\$(CMD): \$(SRCS)
+	 \$(FC) \$(FOPTS) \$(SRCS) \$(LIBS) -o \$(CMD)
+install:
+	-mv \$(CMD) \${BINDIR}/
+EOF
+make
+make install
+rm makefile 
+#-------------------
+
+#-------------------
+cat >makefile <<EOF
+FOPTS=${FFLAGS}
+FC=${FCMP}
+BINDIR= ../exec
+LIBS=-L${LIBDIRW3EMC} -l${W3LIB}   -L${LIBDIRBACIO} -l${BACIOLIB}
+SRCS=   ukm_hires_merge.f
+CMD=ukm_hires_merge
+\$(CMD): \$(SRCS)
+	 \$(FC) \$(FOPTS) \$(SRCS) \$(LIBS) -o \$(CMD)
+install:
+	-mv \$(CMD) \${BINDIR}/
+EOF
+make
+make install
+rm makefile 
+#-------------------
+
+#-------------------
+export FFLAGS="-O2 -convert big_endian -g -traceback"
+cat >makefile <<EOF
+FOPTS=${FFLAGS}
+FC=${FCMP}
+BINDIR= ../exec
+LIBS=-L${LIBDIRBACIO} -l${BACIOLIB} -L${LIBDIRW3EMC} -l${W3LIB}
+SRCS=   mean_anl.f
+CMD=mean_anl
+\$(CMD): \$(SRCS)
+	 \$(FC) \$(FOPTS) \$(SRCS) \$(LIBS) -o \$(CMD)
+install:
+	-mv \$(CMD) \${BINDIR}/
+EOF
+make
+make install
+rm makefile
+#-------------------
+exit
+

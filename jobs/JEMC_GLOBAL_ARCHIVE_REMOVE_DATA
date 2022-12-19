@@ -1,0 +1,80 @@
+#!/bin/bash
+
+########################################
+# Preliminary data setup step
+########################################
+set -xa
+
+####################################
+# SET SHELL PROCESSING VARIABLES
+####################################
+export PS4='$SECONDS + '
+date
+
+###########################################################
+# obtain unique LSF id (jobid) and make temp directories
+###########################################################
+export pid=$$
+export DATA=${DATA:-${DATAROOT:?}/${jobid:?}}
+mkdir -p $DATA
+cd $DATA
+
+####################################
+# Determine Job Output Name on System
+####################################
+export pgmout="OUTPUT.${pid}"
+
+####################################
+# Set emc-global_archive directories
+####################################
+export HOMEemc_global_archive=${HOMEemc_global_archive:-${PACKAGEROOT}/emc_global_archive.${model_ver}}
+export EXECemc_global_archive=${EXECemc_global_archive:-$HOMEemc_global_archive/exec}
+export FIXemc_global_archive=${FIXemc_global_archive:-$HOMEemc_global_archive/fix}
+export PARMemc_global_archive=${PARMemc_global_archive:-$HOMEemc_global_archive/parm}
+export USHemc_global_archive=${USHemc_global_archive:-$HOMEemc_global_archive/ush}
+
+####################################
+# Run setpdy and initialize PDY variables
+####################################
+export cycle=${cycle:-t${cyc}z}
+setpdy.sh
+. ./PDY
+
+####################################
+# Define NET/RUN variables
+####################################
+export NET=${NET:-jemc_global_archive}
+export RUN=${RUN:-remove_data}
+
+####################################
+# Define model and obs variables
+####################################
+export model_list=${model_list:-"gfs"}
+export obs_list=${obs_list:-"prepbufr_gdas"}
+export fit2obs_model_list=${fits2obs_model_list:-"fnl"}
+
+####################################
+# Define ARCHIN variables
+####################################
+export ARCHIN=${ARCHIN:-/lfs/h2/emc/vpppg/noscrub/$USER/archive}
+
+#######################################################################
+# Execute the script
+#######################################################################
+env
+
+$HOMEemc_global_archive/scripts/ex_emc-global_archive_remove_data.sh
+export err=$?; err_chk
+
+cat $pgmout
+
+msg="JOB $job HAS COMPLETED NORMALLY."
+postmsg "$jlogfile" "$msg"
+
+KEEPDATA=${KEEPDATA:-NO}
+if [ "$KEEPDATA" != "YES" ] ; then
+  cd $DATAROOT
+  rm -rf $DATA
+fi
+
+date

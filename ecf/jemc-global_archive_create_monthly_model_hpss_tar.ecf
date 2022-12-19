@@ -34,11 +34,11 @@ export TMPDIR=$DATAROOT
 export NET=jemc_global_archive
 export RUN=create_monthly_model_hpss_tar
 export ARCHIN=/lfs/h2/emc/vpppg/noscrub/$USER/archive
-export HPSSmodel=/NCEPDEV/emc-global/5year/Mallory.Row/model_data
+export HPSSmodel=/NCEPDEV/emc-global/5year/$USER/model_data
 export KEEPDATA=NO
 
-export TAR_YYYY=2022
-export TAR_mm=12
+export TAR_YYYY=$(date -d "1 month ago" '+%Y')
+export TAR_mm=$(date -d "1 month ago" '+%m')
 
 export model_list="gfs cmc fno ukm ecm cdas jma cfsr ncmrwf ecmg4"
 

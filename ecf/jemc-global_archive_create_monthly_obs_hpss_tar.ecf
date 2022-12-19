@@ -34,11 +34,11 @@ export TMPDIR=$DATAROOT
 export NET=jemc_global_archive
 export RUN=create_monthly_obs_hpss_tar
 export ARCHIN=/lfs/h2/emc/vpppg/noscrub/$USER/archive
-export HPSSobs=/NCEPDEV/emc-global/5year/Mallory.Row/obs_data
+export HPSSobs=/NCEPDEV/emc-global/5year/$USER/obs_data
 export KEEPDATA=NO
 
-export TAR_YYYY=2022
-export TAR_mm=12
+export TAR_YYYY=$(date -d "1 month ago" '+%Y')
+export TAR_mm=$(date -d "1 month ago" '+%m')
 
 export obs_list="prepbufr_gdas prepbufr_nam prepbufr_rap ccpa_accum24hr ccpa_accum6hr nohrsc_accum24hr get_d osi_saf ghrsst_median OBSPRCP"
 

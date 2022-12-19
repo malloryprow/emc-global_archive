@@ -34,10 +34,10 @@ export TMPDIR=$DATAROOT
 export NET=jemc_global_archive
 export RUN=create_yearly_fit2obs_hpss_tar
 export ARCHIN=/lfs/h2/emc/vpppg/noscrub/$USER/archive
-export HPSSfit2obs=/NCEPDEV/emc-global/5year/Mallory.Row/fit2obs_data
+export HPSSfit2obs=/NCEPDEV/emc-global/5year/$USER/fit2obs_data
 export KEEPDATA=NO
 
-export TAR_YYYY=2022
+export TAR_YYYY=$(date -d "1 year ago" '+%Y')
 
 export fit2obs_model_list="fnl"
 

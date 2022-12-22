@@ -417,53 +417,66 @@ elif run_settings_dict['OBS'] == 'osi_saf':
             os.makedirs(obs_run_dir)
         os.chdir(obs_run_dir)
         print("In run directory: "+obs_run_dir)
-        # Daily File
-        daily_run_file = os.path.join(
-            obs_run_dir, 'osi_saf.multi.'
-            +PDYm_m1_dt.strftime('%Y%m%d')+'00to'
-            +PDYm+'00_G004.nc'
-        )
-        daily_archive_file = os.path.join(
-            obs_archive_dir, 'osi_saf.multi.'
-            +PDYm_m1_dt.strftime('%Y%m%d')+'00to'
-            +PDYm+'00_G004.nc'
-        )
-        daily_tmp_file = os.path.join(
-            obs_run_dir, 'tmp_osi_saf.multi.'
-            +PDYm_m1_dt.strftime('%Y%m%d')+'00to'
-            +PDYm+'00_G004.nc'
-        )
-        if not ega_util.check_file(daily_archive_file):
-            for hem in ['nh', 'sh']:
+        # Daily NH and SH files and regridding
+        for hem in ['nh', 'sh']:
+            daily_hem_run_file = os.path.join(
+                obs_run_dir, 'osi_saf.multi.'
+                +PDYm_m1_dt.strftime('%Y%m%d')+'00to'
+                +PDYm+'00_'+hem+'.nc'
+            )
+            tmp_hem_G004_file = os.path.join(
+                obs_run_dir,
+                'osi_saf.multi.'+hem+'.'
+                +PDYm_m1_dt.strftime('%Y%m%d')+'00to'
+                +PDYm+'00_G004.nc'
+            )
+            daily_hem_archive_file = os.path.join(
+                obs_archive_dir, 'osi_saf.multi.'
+                +PDYm_m1_dt.strftime('%Y%m%d')+'00to'
+                +PDYm+'00_'+hem+'.nc'
+            )
+            if not ega_util.check_file(daily_hem_archive_file):
                 source_hem_file = os.path.join(
-                    osi_saf_prod_dir, PDYm_m12hr_dt.strftime('%Y%m%d'), 
+                    osi_saf_prod_dir, PDYm_m12hr_dt.strftime('%Y%m%d'),
                     'seaice', 'osisaf',
                     'ice_conc_'+hem+'_polstere-100_multi_'
                     +PDYm_m12hr_dt.strftime('%Y%m%d')+'1200.nc'
                 )
-                tmp_hem_file = os.path.join(
-                    obs_run_dir,
-                    'osi_saf.multi.'+hem+'.'
-                    +PDYm_m1_dt.strftime('%Y%m%d')+'00to'
-                    +PDYm+'00.nc'
+                if not ega_util.check_file(daily_hem_run_file):
+                    ega_util.copy_file(source_hem_file, daily_hem_run_file)
+                if ega_util.check_file(daily_hem_run_file):
+                    hem_data = netcdf.Dataset(daily_hem_run_file, 'a',
+                                      format='NETCDF3_CLASSIC')
+                    hem_data['time'][:] = hem_data.variables['time'][:] + 43200
+                    hem_data.close()
+                    if run_settings_dict['SENDARCH'] == 'YES':
+                        ega_util.copy_file(daily_hem_run_file, daily_hem_archive_file)
+            if ega_util.check_file(daily_hem_archive_file):
+                ega_util.run_shell_command(
+                    ['cdo', 'remapbil,'+G004_grid_file,
+                     daily_hem_archive_file, tmp_hem_G004_file]
                 )
-                tmp_hem_G004_file = os.path.join(
-                    obs_run_dir,
-                    'osi_saf.multi.'+hem+'.'
-                    +PDYm_m1_dt.strftime('%Y%m%d')+'00to'
-                    +PDYm+'00_G004.nc'
-                )
-                if not ega_util.check_file(tmp_hem_file):
-                    ega_util.copy_file(source_hem_file, tmp_hem_file)
-                if ega_util.check_file(tmp_hem_file):
-                    ega_util.run_shell_command(
-                        ['cdo', 'remapbil,'+G004_grid_file,
-                         tmp_hem_file, tmp_hem_G004_file]
-                    )
-                if hem == 'nh':
-                    tmp_nh_G004_file = tmp_hem_G004_file
-                elif hem == 'sh':
-                    tmp_sh_G004_file = tmp_hem_G004_file
+            if hem == 'nh':
+                tmp_nh_G004_file = tmp_hem_G004_file
+            else:
+                tmp_sh_G004_file = tmp_hem_G004_file
+        # Daily G004 (0.5 deg latlon) File
+        daily_G004_run_file = os.path.join(
+            obs_run_dir, 'osi_saf.multi.'
+            +PDYm_m1_dt.strftime('%Y%m%d')+'00to'
+            +PDYm+'00_G004.nc'
+        )
+        daily_G004_archive_file = os.path.join(
+            obs_archive_dir, 'osi_saf.multi.'
+            +PDYm_m1_dt.strftime('%Y%m%d')+'00to'
+            +PDYm+'00_G004.nc'
+        )
+        daily_G004_tmp_file = os.path.join(
+            obs_run_dir, 'tmp_osi_saf.multi.'
+            +PDYm_m1_dt.strftime('%Y%m%d')+'00to'
+            +PDYm+'00_G004.nc'
+        )
+        if not ega_util.check_file(daily_G004_archive_file):
             if ega_util.check_file(tmp_nh_G004_file) \
                     and ega_util.check_file(tmp_sh_G004_file):
                 nh_data = netcdf.Dataset(tmp_nh_G004_file)
@@ -484,9 +497,9 @@ elif run_settings_dict['OBS'] == 'osi_saf':
                 )
                 sh_time = sh_data.variables['time'][:]
                 sh_time_bnds = sh_data.variables['time_bnds'][:]
-                if os.path.exists(daily_tmp_file):
-                    os.remove(daily_tmp_file)
-                merged_data = netcdf.Dataset(daily_tmp_file, 'w',
+                if os.path.exists(daily_G004_tmp_file):
+                    os.remove(daily_G004_tmp_file)
+                merged_data = netcdf.Dataset(daily_G004_tmp_file, 'w',
                                              format='NETCDF3_CLASSIC')
                 for attr in nh_data.ncattrs():
                     if attr == 'history':
@@ -546,42 +559,42 @@ elif run_settings_dict['OBS'] == 'osi_saf':
                     ,nh_data.variables[var]._FillValue)
                     merged_var[:] = merged_var_vals
                 merged_data.close()
-                if ega_util.check_file(daily_tmp_file):
-                    ega_util.copy_file(daily_tmp_file, daily_run_file)
+                if ega_util.check_file(daily_G004_tmp_file):
+                    ega_util.copy_file(daily_G004_tmp_file, daily_G004_run_file)
                 if run_settings_dict['SENDARCH'] == 'YES':
-                    ega_util.copy_file(daily_run_file, daily_archive_file)
-                    ega_util.check_file(daily_archive_file)
-        # Weekly File
-        weekly_run_file = os.path.join(
+                    ega_util.copy_file(daily_G004_run_file, daily_G004_archive_file)
+                    ega_util.check_file(daily_G004_archive_file)
+        # Weekly G004 (0.5 deg latlon) File
+        weekly_G004_run_file = os.path.join(
             obs_run_dir,
             'osi_saf.multi.'
             +PDYm_m7_dt.strftime('%Y%m%d')+'00to'
             +PDYm+'00_G004.nc'
         )
-        weekly_archive_file = os.path.join(
+        weekly_G004_archive_file = os.path.join(
             obs_archive_dir, 
             'osi_saf.multi.'
             +PDYm_m7_dt.strftime('%Y%m%d')+'00to'
             +PDYm+'00_G004.nc'
         )
-        weekly_tmp_file = os.path.join(
+        weekly_G004_tmp_file = os.path.join(
             obs_run_dir,
             'tmp_osi_saf.multi.'
             +PDYm_m7_dt.strftime('%Y%m%d')+'00to'
             +PDYm+'00_G004.nc'
         )
-        if not ega_util.check_file(weekly_archive_file):
+        if not ega_util.check_file(weekly_G004_archive_file):
             weekly_daily_file_list = []
             PDYm_m_dt = PDYm_m7_dt
             while PDYm_m_dt <= PDYm_m1_dt:
-                daily_archive_file = os.path.join(
+                daily_G004_archive_file = os.path.join(
                     obs_archive_dir, 'osi_saf.multi.'
                     +PDYm_m_dt.strftime('%Y%m%d')+'00to'
                     +(PDYm_m_dt + datetime.timedelta(days=1))\
                     .strftime('%Y%m%d')+'00_G004.nc'
                 )
-                if os.path.exists(daily_archive_file):
-                    weekly_daily_file_list.append(daily_archive_file)
+                if os.path.exists(daily_G004_archive_file):
+                    weekly_daily_file_list.append(daily_G004_archive_file)
                 PDYm_m_dt = PDYm_m_dt + datetime.timedelta(days=1)
             weekly_daily_file_list = weekly_daily_file_list[::-1]
             if len(weekly_daily_file_list) >= 4:
@@ -589,10 +602,10 @@ elif run_settings_dict['OBS'] == 'osi_saf':
                 for daily_file in weekly_daily_file_list:
                     ncea_cmd_list.append(daily_file)
                 ncea_cmd_list.append('-o')
-                ncea_cmd_list.append(weekly_tmp_file)
+                ncea_cmd_list.append(weekly_G004_tmp_file)
                 ega_util.run_shell_command(ncea_cmd_list)
-                if ega_util.check_file(weekly_tmp_file):
-                    weekly_data = netcdf.Dataset(weekly_tmp_file, 'a',
+                if ega_util.check_file(weekly_G004_tmp_file):
+                    weekly_data = netcdf.Dataset(weekly_G004_tmp_file, 'a',
                                                  format='NETCDF3_CLASSIC')
                     weekly_data.setncattr(
                         'start_date', PDYm_m7_dt.strftime('%Y-%m-%d %H:%M:%S')
@@ -605,13 +618,13 @@ elif run_settings_dict['OBS'] == 'osi_saf':
                         weekly_data.variables['time_bnds'][:][0][1]
                     ]
                     weekly_data.close()
-                if ega_util.check_file(weekly_tmp_file):
-                    ega_util.copy_file(weekly_tmp_file, weekly_run_file)
+                if ega_util.check_file(weekly_G004_tmp_file):
+                    ega_util.copy_file(weekly_G004_tmp_file, weekly_G004_run_file)
                 if run_settings_dict['SENDARCH'] == 'YES':
-                    ega_util.copy_file(weekly_run_file, weekly_archive_file)
-                    ega_util.check_file(weekly_archive_file)
+                    ega_util.copy_file(weekly_G004_run_file, weekly_G004_archive_file)
+                    ega_util.check_file(weekly_G004_archive_file)
             else:
-                print("Not enough file to make "+weekly_archive_file
+                print("Not enough file to make "+weekly_G004_archive_file
                       +": "+' '.join(weekly_daily_file_list))
 # get_d - NESDIS GET_D Flux files
 elif run_settings_dict['OBS']  == 'get_d':

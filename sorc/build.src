@@ -4,7 +4,11 @@ set -x
 source ../versions/build.ver
 module purge
 module load envvar/${envvar_ver}
+module load PrgEnv-intel/${PrgEnvintel_ver}
 module load intel/${intel_ver}
+module load craype/${craype_ver}
+module load cray-mpich/${craympich_ver}
+module load cray-pals/${craypals_ver}
 module load bacio/${bacio_ver}
 module load w3emc/${w3emc_ver}
 
@@ -89,5 +93,27 @@ make
 make install
 rm makefile
 #-------------------
-exit
 
+#-------------------
+export FFLAGS="-FR -cpp"
+cat >makefile <<EOF
+LIBS=${W3NCO_LIB4} ${W3EMC_LIB4} ${BACIO_LIB4}
+FC=ftn
+FFLAGS=${FFLAGS}
+LDFLAGS=
+BINDIR= ../exec
+SRCS=ccpa24hr_accum.f
+OBJS=ccpa24hr_accum.o
+CMD=ccpa24hr_accum
+all:		\$(CMD)
+\$(CMD):		\$(OBJS)
+	\$(FC) \$(LDFLAGS) -o \$(@) \$(OBJS) \$(LIBS)
+install:
+	-mv \$(CMD) \${BINDIR}/
+EOF
+make
+make install
+rm makefile
+#-------------------
+
+exit

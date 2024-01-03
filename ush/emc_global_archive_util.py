@@ -29,7 +29,7 @@ def run_shell_command(command):
 
     """
     print("--- RUNNING "+' '.join(command))
-    if any(mark in ' '.join(command) for mark in ['"', "'", '|', '*']):
+    if any(mark in ' '.join(command) for mark in ['"', "'", '|', '*', '<']):
         run_command = subprocess.run(
             ' '.join(command), shell=True
         )

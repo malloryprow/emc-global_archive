@@ -315,12 +315,22 @@ elif run_settings_dict['OBS'] == 'prepbufr_rap':
                         ega_util.set_rstprod_permissions(archive_file)
 # ccpa_accum24hr - CCPA 24 hour accumulation files
 elif run_settings_dict['OBS'] == 'ccpa_accum24hr':
+    CCPA24HR_ACCUM = os.path.join(
+        run_settings_dict['HOMEemc_global_archive'], 'exec',
+        'ccpa24hr_accum'
+    )
     ccpa_accum24hr_prod_dir = os.path.join(
         run_settings_dict['COMROOT'], 'verf_precip',
         run_settings_dict['verf_precip_ver']
     )
+    ccpa_prod_dir = os.path.join(
+        run_settings_dict['COMROOT'], 'ccpa',
+        run_settings_dict['ccpa_ver']
+    )
     for PDYm_key in list(PDYm_dict.keys()):
         PDYm = PDYm_dict[PDYm_key]
+        PDYm_dt = datetime.datetime.strptime(PDYm, '%Y%m%d')
+        PDYm_m1_dt = PDYm_dt - datetime.timedelta(hours=24)
         obs_run_dir = os.path.join(base_obs_run_dir, PDYm)
         if not os.path.exists(obs_run_dir):
             print("Making directory "+obs_run_dir)
@@ -337,7 +347,37 @@ elif run_settings_dict['OBS'] == 'ccpa_accum24hr':
             ccpa_accum24hr_prod_dir, 'precip.'+PDYm, 'ccpa.'+PDYm+'12.24h'
         )
         if not ega_util.check_file(archive_file):
-            ega_util.copy_file(source_file, run_file)
+            input_acc_ccpa_file = os.path.join(obs_run_dir, 'input_acc_ccpa')
+            with open(input_acc_ccpa_file, 'w') as write_iac:
+                write_iac.write('obs\n')
+                write_iac.write('ccpa.\n')
+                ccpa1 = os.path.join(
+                    ccpa_prod_dir, 'ccpa.'+PDYm_m1_dt.strftime('%Y%m%d'), '18',
+                    'ccpa.t18z.06h.hrap.conus'
+                )
+                if os.path.exists(ccpa1):
+                    write_iac.write(ccpa1+'\n')
+                ccpa2=os.path.join(
+                    ccpa_prod_dir, 'ccpa.'+PDYm, '00',
+                    'ccpa.t00z.06h.hrap.conus'
+                )
+                if os.path.exists(ccpa2):
+                    write_iac.write(ccpa2+'\n')
+                ccpa3=os.path.join(
+                    ccpa_prod_dir, 'ccpa.'+PDYm, '06',
+                    'ccpa.t06z.06h.hrap.conus'
+                )
+                if os.path.exists(ccpa3):
+                    write_iac.write(ccpa3+'\n')
+                ccpa4=os.path.join(
+                    ccpa_prod_dir, 'ccpa.'+PDYm, '12',
+                    'ccpa.t12z.06h.hrap.conus'
+                )
+                if os.path.exists(ccpa4):
+                    write_iac.write(ccpa4)
+            ega_util.run_shell_command(
+                [CCPA24HR_ACCUM, '<', input_acc_ccpa_file]
+            )
             if run_settings_dict['SENDARCH'] == 'YES':
                 ega_util.copy_file(run_file, archive_file)
                 ega_util.check_file(archive_file)

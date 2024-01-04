@@ -23,6 +23,7 @@ export udunits_ver=2.2.28
 export wgrib2_ver=2.0.8
 export zlib_ver=1.2.11
 
+export ccpa_ver=v4.2
 export cdas_ver=v1.2
 export cmc_ver=v1.2
 export cfs_ver=v2.3

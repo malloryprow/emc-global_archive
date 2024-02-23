@@ -1,0 +1,91 @@
+#!/bin/bash
+
+########################################
+# Preliminary data setup step
+########################################
+set -xa
+
+####################################
+# SET SHELL PROCESSING VARIABLES
+####################################
+export PS4='$SECONDS + '
+date
+
+###########################################################
+# obtain unique LSF id (jobid) and make temp directories
+###########################################################
+export pid=$$
+export DATA=${DATA:-${DATAROOT:?}/${jobid:?}}
+mkdir -p $DATA
+cd $DATA
+
+####################################
+# Determine Job Output Name on System
+####################################
+export pgmout="OUTPUT.${pid}"
+
+####################################
+# Set emc-global_archive directories
+####################################
+export HOMEemc_global_archive=${HOMEemc_global_archive:-${PACKAGEROOT}/emc_global_archive.${model_ver}}
+export EXECemc_global_archive=${EXECemc_global_archive:-$HOMEemc_global_archive/exec}
+export FIXemc_global_archive=${FIXemc_global_archive:-$HOMEemc_global_archive/fix}
+export PARMemc_global_archive=${PARMemc_global_archive:-$HOMEemc_global_archive/parm}
+export USHemc_global_archive=${USHemc_global_archive:-$HOMEemc_global_archive/ush}
+
+####################################
+# Run setpdy and initialize PDY variables
+####################################
+export cycle=${cycle:-t${cyc}z}
+setpdy.sh
+. ./PDY
+export VDATE=${VDATE:-$PDYm1}
+
+####################################
+# Define NET/RUN variables
+####################################
+export NET=${NET:-jemc_global_archive}
+export RUN=${RUN:-get_evs_data}
+
+####################################
+# SENDARCH  - Send to archive
+####################################
+export SENDARCH=${SENDARCH:-YES}
+
+####################################
+# Define model variables
+####################################
+export evs_model_list=${evs_model_list:-"gfs"}
+
+####################################
+# Define COMIN/ARCHOUT variables
+####################################
+export COMROOT=${COMROOT:-/lfs/h1/ops/prod/com}
+export DCOMROOT=${DCOMROOT:-/lfs/h1/ops/prod/dcom}
+export ARCHOUT=${ARCHOUT:-/lfs/h2/emc/vpppg/noscrub/$USER/archive}
+export ARCHOUTevs=$ARCHOUT/evs_data
+
+mkdir -p $ARCHOUT
+mkdir -p $ARCHOUTevs
+
+
+#######################################################################
+# Execute the script
+#######################################################################
+env
+
+$HOMEemc_global_archive/scripts/ex_emc-global_archive_get_evs_data.sh
+export err=$?; err_chk
+
+cat $pgmout
+
+msg="JOB $job HAS COMPLETED NORMALLY."
+postmsg "$jlogfile" "$msg"
+
+KEEPDATA=${KEEPDATA:-NO}
+if [ "$KEEPDATA" != "YES" ] ; then
+  cd $DATAROOT
+  rm -rf $DATA
+fi
+
+date

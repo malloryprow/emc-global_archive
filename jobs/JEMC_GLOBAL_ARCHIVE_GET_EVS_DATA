@@ -39,32 +39,42 @@ export USHemc_global_archive=${USHemc_global_archive:-$HOMEemc_global_archive/us
 export cycle=${cycle:-t${cyc}z}
 setpdy.sh
 . ./PDY
+export VDATE=${VDATE:-$PDYm1}
 
 ####################################
 # Define NET/RUN variables
 ####################################
 export NET=${NET:-jemc_global_archive}
-export RUN=${RUN:-remove_data}
+export RUN=${RUN:-get_evs_data}
 
 ####################################
-# Define model and obs variables
+# SENDARCH  - Send to archive
 ####################################
-export model_list=${model_list:-"gfs"}
-export obs_list=${obs_list:-"prepbufr_gdas"}
-export fit2obs_model_list=${fits2obs_model_list:-"fnl"}
+export SENDARCH=${SENDARCH:-YES}
+
+####################################
+# Define model variables
+####################################
 export evs_model_list=${evs_model_list:-"gfs"}
 
 ####################################
-# Define ARCHIN variables
+# Define COMIN/ARCHOUT variables
 ####################################
-export ARCHIN=${ARCHIN:-/lfs/h2/emc/vpppg/noscrub/$USER/archive}
+export COMROOT=${COMROOT:-/lfs/h1/ops/prod/com}
+export DCOMROOT=${DCOMROOT:-/lfs/h1/ops/prod/dcom}
+export ARCHOUT=${ARCHOUT:-/lfs/h2/emc/vpppg/noscrub/$USER/archive}
+export ARCHOUTevs=$ARCHOUT/evs_data
+
+mkdir -p $ARCHOUT
+mkdir -p $ARCHOUTevs
+
 
 #######################################################################
 # Execute the script
 #######################################################################
 env
 
-$HOMEemc_global_archive/scripts/ex_emc-global_archive_remove_data.sh
+$HOMEemc_global_archive/scripts/ex_emc-global_archive_get_evs_data.sh
 export err=$?; err_chk
 
 cat $pgmout

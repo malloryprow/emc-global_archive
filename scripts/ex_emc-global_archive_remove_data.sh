@@ -63,3 +63,11 @@ for model in $fit2obs_model_list; do
         python ${USHemc_global_archive}/remove_data.py --removedate=$rPDY --archdir=$ARCHIN/fit2obs_data/fnl/horiz/fcs
     fi
 done
+
+# Remove EVS data
+for model in $evs_model_list; do
+    rm_back_hr=17616
+    rCDATE=`$NDATE -$rm_back_hr ${PDY}00`
+    rPDY=`echo $rCDATE |cut -c 1-8`
+    python ${USHemc_global_archive}/remove_data.py --removedate=$rPDY --archdir=$ARCHIN/evs_data/stats/global_det/${model}
+done

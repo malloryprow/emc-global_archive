@@ -1,4 +1,4 @@
-#PBS -N jemc_global_archive_remove_data
+#PBS -N jemc_global_archive_get_evs_data
 #PBS -j oe
 #PBS -S /bin/bash
 #PBS -q dev_transfer
@@ -19,7 +19,6 @@ versionfile=$HOMEemc_global_archive/versions/run.ver
 . $versionfile
 
 module reset
-module load envvar/${envvar_ver}
 module load prod_util/${prod_util_ver}
 module load prod_envir/${prod_envir_ver}
 module load intel/${intel_ver}
@@ -27,20 +26,20 @@ module load python/${python_ver}
 
 export cyc=00
 export DATAROOT=/lfs/h2/emc/ptmp/$USER/output_crons
-export job=${PBS_JOBNAME:-jemc_global_archive_remove_data}
+export job=${PBS_JOBNAME:-jemc_global_archive_get_evs_data}
 export jobid=$job.${PBS_JOBID:-$$}
 export TMPDIR=$DATAROOT
 export NET=jemc_global_archive
-export RUN=remove_data
-export ARCHIN=/lfs/h2/emc/vpppg/noscrub/$USER/archive
+export RUN=get_evs_data
+export ARCHOUT=/lfs/h2/emc/vpppg/noscrub/$USER/archive
+export SENDARCH=YES
+export KEEPDATA=YES
 
-export model_list="gfs cmc fno ukm ecm cdas jma cfsr ncmrwf ecmg4"
-export obs_list="prepbufr_gdas prepbufr_nam prepbufr_rap ccpa_accum24hr ccpa_accum6hr nohrsc_accum24hr get_d osi_saf ghrsst_median"
-export fit2obs_model_list="fnl"
+export VDATE=$(date -d '1 day ago' +%Y%m%d)
+
 export evs_model_list="cfs cmc ecmwf fnmoc gfs ukmet"
 
-$HOMEemc_global_archive/jobs/JEMC_GLOBAL_ARCHIVE_REMOVE_DATA
-
+$HOMEemc_global_archive/jobs/JEMC_GLOBAL_ARCHIVE_GET_EVS_DATA
 ######################################################################
-# Purpose: This does the data removal for emc-global_archive 
+# Purpose: This does the daily EVS archiving for emc-global_archive 
 ######################################################################

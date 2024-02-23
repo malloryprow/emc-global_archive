@@ -141,6 +141,10 @@ elif remove_archive_dir.rpartition('/')[2] == 'ghrsst_median':
         os.path.join(remove_archive_dir,
                      '*'+run_settings_dict['PDY']+'00.nc')
     )
+elif 'evs_data' in remove_archive_dir:
+    remove_file_list = glob.glob(
+        os.path.join(remove_archive_dir+'.'+run_settings_dict['PDY'])
+    )
 else:
     remove_file_list = glob.glob(
         os.path.join(remove_archive_dir,'*'+run_settings_dict['PDY']+'*')

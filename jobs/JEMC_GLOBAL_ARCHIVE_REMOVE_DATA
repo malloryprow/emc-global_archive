@@ -52,6 +52,7 @@ export RUN=${RUN:-remove_data}
 export model_list=${model_list:-"gfs"}
 export obs_list=${obs_list:-"prepbufr_gdas"}
 export fit2obs_model_list=${fits2obs_model_list:-"fnl"}
+export evs_model_list=${evs_model_list:-"gfs"}
 
 ####################################
 # Define ARCHIN variables

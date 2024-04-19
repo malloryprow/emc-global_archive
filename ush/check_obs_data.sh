@@ -30,6 +30,6 @@ module load intel/${intel_ver}
 module load python/${python_ver}
 
 # Run
-for obs in prepbufr_gdas prepbufr_nam prepbufr_rap ccpa_accum24hr ccpa_accum6hr nohrsc_accum24hr get_d osi_saf ghrsst_median OBSPRCP; do
+for obs in prepbufr_gdas prepbufr_nam prepbufr_rap ccpa_accum24hr ccpa_accum6hr nohrsc_accum24hr get_d osi_saf ghrsst_ospo OBSPRCP; do
     python ${HOMEemc_global_archive}/ush/check_obs_data.py --date=$PDY --archdir=$ARCHIVE_dir --rundir=$RUN_dir --obs=$obs
 done

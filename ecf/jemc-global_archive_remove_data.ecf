@@ -35,7 +35,7 @@ export RUN=remove_data
 export ARCHIN=/lfs/h2/emc/vpppg/noscrub/$USER/archive
 
 export model_list="gfs cmc fno ukm ecm cdas jma cfsr ncmrwf ecmg4"
-export obs_list="prepbufr_gdas prepbufr_nam prepbufr_rap ccpa_accum24hr ccpa_accum6hr nohrsc_accum24hr get_d osi_saf ghrsst_median"
+export obs_list="prepbufr_gdas prepbufr_nam prepbufr_rap ccpa_accum24hr ccpa_accum6hr nohrsc_accum24hr get_d osi_saf ghrsst_ospo"
 export fit2obs_model_list="fnl"
 export evs_model_list="cfs cmc ecmwf fnmoc gfs ukmet"
 

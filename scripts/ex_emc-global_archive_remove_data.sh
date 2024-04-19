@@ -35,7 +35,7 @@ for obs in $obs_list; do
     if [ $obs = "nohrsc_accum24hr" ]; then rm_back_hr=17616; fi
     if [ $obs = "get_d" ];            then rm_back_hr=17616; fi
     if [ $obs = "osi_saf" ];          then rm_back_hr=17616; fi
-    if [ $obs = "ghrsst_median" ];    then rm_back_hr=17616; fi
+    if [ $obs = "ghrsst_ospo" ];      then rm_back_hr=17616; fi
     if [ $obs = "OBSPRCP" ];          then rm_back_hr=17616; fi
     cd $DATA
     rCDATE=`$NDATE -$rm_back_hr ${PDY}00`

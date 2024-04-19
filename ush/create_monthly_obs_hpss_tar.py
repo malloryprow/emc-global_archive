@@ -209,9 +209,14 @@ else:
         YEARMON_file_list = glob.glob(
             '*-'+run_settings_dict['YEARMON']+'*'
         )
-    elif run_settings_dict['OBS'] in ['ghrsst_median', 'osi_saf']:
+    elif run_settings_dict['OBS'] == 'osi_saf':
         YEARMON_file_list = glob.glob(
-            '*'+run_settings_dict['YEARMON']+'*'
+            'ice_conc_*_polstere-100_multi_'
+            +run_settings_dict['YEARMON']+'*'
+        )
+    elif run_settings_dict['OBS'] == 'ghrsst_opso':
+        YEARMON_file_list = glob.glob(
+            run_settings_dict['YEARMON']+'*'
         )
     else:
         YEARMON_file_list = glob.glob(

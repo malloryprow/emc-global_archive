@@ -225,19 +225,11 @@ if os.path.exists(obs_archive_dir):
         check_file_list.append('GETDL3_DAL_CONUS_'+PDY_dt.strftime('%Y%j')
                                +'_1.0.nc')
     elif run_settings_dict['OBS'] == 'osi_saf':
-        PDYm1_dt = PDY_dt - datetime.timedelta(days=1)
-        PDYm7_dt = PDY_dt - datetime.timedelta(days=7)
-        check_file_list.append('osi_saf.multi.'
-                               +PDYm1_dt.strftime('%Y%m%d')+'00to'
-                               +run_settings_dict['PDY']+'00_G004.nc')
-        check_file_list.append('osi_saf.multi.'
-                               +PDYm7_dt.strftime('%Y%m%d')+'00to'
-                               +run_settings_dict['PDY']+'00_G004.nc')
-    elif run_settings_dict['OBS'] == 'ghrsst_median':
-        PDYm1_dt = PDY_dt - datetime.timedelta(days=1)
-        check_file_list.append('UKMO-L4_GHRSST-SSTfnd-GMPE-GLOB_valid'
-                               +PDYm1_dt.strftime('%Y%m%d')+'00to'
-                               +run_settings_dict['PDY']+'00.nc')
+        for hem in ['nh', 'sh']:
+            check_file_list.append('ice_conc_+'hem'+_polstere-100_multi_'
+                                   +PDYm1_dt.strftime('%Y%m%d')+'1200.nc')
+    elif run_settings_dict['OBS'] == 'ghrsst_ospo':
+        check_file_list.append(PDY_dt.strftime('%Y%m%d')+'_OSPO_L4_GHRSST.nc')
     elif run_settings_dict['OBS'] == 'OBSPRCP':
         check_file_list.append('usa-dlyprcp-'+run_settings_dict['PDY']) 
     for check_file in check_file_list:

@@ -134,12 +134,13 @@ if remove_archive_dir.rpartition('/')[2] == 'get_d':
 elif remove_archive_dir.rpartition('/')[2] == 'osi_saf':
     remove_file_list = glob.glob(
         os.path.join(remove_archive_dir,
-                     '*'+run_settings_dict['PDY']+'00_G004.nc')
+                     'ice_conc_*_polstere-100_multi_'
+                     '*'+run_settings_dict['PDY']+'1200.nc')
     )
-elif remove_archive_dir.rpartition('/')[2] == 'ghrsst_median':
+elif remove_archive_dir.rpartition('/')[2] == 'ghrsst_ospo':
     remove_file_list = glob.glob(
         os.path.join(remove_archive_dir,
-                     '*'+run_settings_dict['PDY']+'00.nc')
+                     run_settings_dict['PDY']+'_OSPO_L4_GHRSST')
     )
 elif 'evs_data' in remove_archive_dir:
     remove_file_list = glob.glob(

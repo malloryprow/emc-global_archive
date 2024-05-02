@@ -214,7 +214,7 @@ else:
             'ice_conc_*_polstere-100_multi_'
             +run_settings_dict['YEARMON']+'*'
         )
-    elif run_settings_dict['OBS'] == 'ghrsst_opso':
+    elif run_settings_dict['OBS'] == 'ghrsst_ospo':
         YEARMON_file_list = glob.glob(
             run_settings_dict['YEARMON']+'*'
         )

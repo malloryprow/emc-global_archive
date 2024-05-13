@@ -28,6 +28,7 @@ import sys
 import datetime
 import numpy as np
 import netCDF4 as netcdf
+import glob
 import emc_global_archive_util as ega_util
 
 print("\nBEGIN: "+sys.argv[0]+" at "+str(datetime.datetime.today())+"\n")
@@ -528,6 +529,38 @@ elif run_settings_dict['OBS']  == 'ghrsst_ospo':
                 if run_settings_dict['SENDARCH'] == 'YES':
                     ega_util.copy_file(run_file, archive_file)
                     ega_util.check_file(archive_file)
+# ndbc_buoy - NDBC buoy
+elif run_settings_dict['OBS']  == 'ndbc_buoy':
+    ndbc_buoy_prod_dir = os.path.join(
+        run_settings_dict['DCOMROOT']
+    )
+    for PDYm_key in list(PDYm_dict.keys()):
+        PDYm = PDYm_dict[PDYm_key]
+        obs_run_dir = os.path.join(base_obs_run_dir, PDYm)
+        if not os.path.exists(obs_run_dir):
+            print("Making directory "+obs_run_dir)
+            os.makedirs(obs_run_dir)
+        os.chdir(obs_run_dir)
+        PDYm_dt = datetime.datetime.strptime(PDYm, '%Y%m%d')
+        prod_files = os.path.join(ndbc_buoy_prod_dir,
+                                  PDYm_dt.strftime('%Y%m%d'),
+                                  'validation_data', 'marine',
+                                  'buoy')
+        run_file = os.path.join(obs_run_dir,
+                                f"buoy_{PDYm_dt:%Y%m%d}.tar")
+        archive_file = os.path.join(obs_archive_dir,
+                                    f"buoy_{PDYm_dt:%Y%m%d}.tar")
+        if not ega_util.check_file(archive_file):
+            if len(glob.glob(prod_files+'/*')) != 0:
+                ega_util.run_shell_command(
+                    ['tar', '-cvf', run_file, '-C', prod_files, '.']
+                )
+                if ega_util.check_file(run_file):
+                    if run_settings_dict['SENDARCH'] == 'YES':
+                        ega_util.copy_file(run_file, archive_file)
+                        ega_util.check_file(archive_file)
+            else:
+                print(f"No files matching {prod_files}/*")
 # OBSPRCP - CPC rain gauge files
 elif run_settings_dict['OBS'] == 'OBSPRCP':
     for PDYm_key in list(PDYm_dict.keys()):

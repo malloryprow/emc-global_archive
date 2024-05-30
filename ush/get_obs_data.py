@@ -392,21 +392,22 @@ elif run_settings_dict['OBS'] == 'ccpa_accum6hr':
         os.chdir(obs_run_dir)
         print("In run directory: "+obs_run_dir)
         for valid_hr in run_settings_dict['ccpa_accum6hr_valid_hr_list']:
-            run_file = os.path.join(
-                obs_run_dir, 'ccpa.hrap.'+PDYm+valid_hr+'.6h'
-            ) 
-            archive_file = os.path.join(
-                obs_archive_dir, 'ccpa.hrap.'+PDYm+valid_hr+'.6h'
-            )
-            source_file = os.path.join(
-                ccpa_accum6hr_prod_dir, 'ccpa.'+PDYm, valid_hr,
-                'ccpa.t'+valid_hr+'z.06h.hrap.conus.gb2'
-            )
-            if not ega_util.check_file(archive_file):
-                ega_util.copy_file(source_file, run_file)
-                if run_settings_dict['SENDARCH'] == 'YES':
-                    ega_util.copy_file(run_file, archive_file)
-                    ega_util.check_file(archive_file)
+            for grid in ['hrap', '1p0']:
+                run_file = os.path.join(
+                    obs_run_dir, 'ccpa.'+grid+'.'+PDYm+valid_hr+'.6h'
+                )
+                archive_file = os.path.join(
+                    obs_archive_dir, 'ccpa.'+grid+'.'+PDYm+valid_hr+'.6h'
+                )
+                source_file = os.path.join(
+                    ccpa_accum6hr_prod_dir, 'ccpa.'+PDYm, valid_hr,
+                    'ccpa.t'+valid_hr+'z.06h.'+grid+'.conus.gb2'
+                )
+                if not ega_util.check_file(archive_file):
+                    ega_util.copy_file(source_file, run_file)
+                    if run_settings_dict['SENDARCH'] == 'YES':
+                        ega_util.copy_file(run_file, archive_file)
+                        ega_util.check_file(archive_file)
 # nohrsc_accum24hr - NOHRSC 24 hour accumulation files
 elif run_settings_dict['OBS'] == 'nohrsc_accum24hr':
     nohrsc_accum24hr_prod_dir = os.path.join(

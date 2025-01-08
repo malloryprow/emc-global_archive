@@ -40,7 +40,7 @@ export KEEPDATA=NO
 export TAR_YYYY=$(date -d "1 month ago" '+%Y')
 export TAR_mm=$(date -d "1 month ago" '+%m')
 
-export obs_list="prepbufr_gdas prepbufr_nam prepbufr_rap ccpa_accum24hr ccpa_accum6hr nohrsc_accum24hr ndbc_buoy osi_saf ghrsst_ospo OBSPRCP"
+export obs_list="prepbufr_gdas prepbufr_nam prepbufr_rap ccpa_accum24hr ccpa_accum6hr nohrsc_accum24hr ndbc_buoy osi_saf ghrsst_ospo jason3 OBSPRCP"
 
 $HOMEemc_global_archive/jobs/JEMC_GLOBAL_ARCHIVE_CREATE_MONTHLY_OBS_HPSS_TAR
 ######################################################################

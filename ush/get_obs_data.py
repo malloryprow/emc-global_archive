@@ -562,6 +562,34 @@ elif run_settings_dict['OBS']  == 'ndbc_buoy':
                         ega_util.check_file(archive_file)
             else:
                 print(f"No files matching {prod_files}/*")
+# JASON3 - satellite altimetry
+elif run_settings_dict['OBS']  == 'jason3':
+    jason3_prod_dir = os.path.join(
+        run_settings_dict['DCOMROOT']
+    )
+    for PDYm_key in list(PDYm_dict.keys()):
+        PDYm = PDYm_dict[PDYm_key]
+        obs_run_dir = os.path.join(base_obs_run_dir, PDYm)
+        if not os.path.exists(obs_run_dir):
+            print("Making directory "+obs_run_dir)
+            os.makedirs(obs_run_dir)
+        os.chdir(obs_run_dir)
+        PDYm_dt = datetime.datetime.strptime(PDYm, '%Y%m%d')
+        prod_file = os.path.join(jason3_prod_dir,
+                                 PDYm_dt.strftime('%Y%m%d'),
+                                 'b031', 'xx124')
+        run_file = os.path.join(obs_run_dir,
+                                'jason3_b031_xx124_'
+                                +PDYm_dt.strftime('%Y%m%d'))
+        archive_file = os.path.join(obs_archive_dir,
+                                    'jason3_b031_xx124_'
+                                     +PDYm_dt.strftime('%Y%m%d'))
+        if not ega_util.check_file(archive_file):
+            ega_util.copy_file(prod_file, run_file)
+            if ega_util.check_file(run_file):
+                if run_settings_dict['SENDARCH'] == 'YES':
+                    ega_util.copy_file(run_file, archive_file)
+                    ega_util.check_file(archive_file)
 # OBSPRCP - CPC rain gauge files
 elif run_settings_dict['OBS'] == 'OBSPRCP':
     for PDYm_key in list(PDYm_dict.keys()):

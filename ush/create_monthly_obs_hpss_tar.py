@@ -222,6 +222,11 @@ else:
         YEARMON_file_list = glob.glob(
             'buoy_'+run_settings_dict['YEARMON']+'*'
         )
+    elif run_settings_dict['OBS'] == 'jason3':
+        YEARMON_file_list = glob.glob(
+            'jason3_b031_xx124_'
+            +run_settings_dict['YEARMON']+'*'
+        )
     else:
         YEARMON_file_list = glob.glob(
             '*.'+run_settings_dict['YEARMON']+'*'

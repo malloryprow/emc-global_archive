@@ -1307,7 +1307,6 @@ elif run_settings_dict['MODEL'] == 'graphcastgfs':
                     file_levels_num_model_archive_dir,
                     source_file.rpartition('/')[2]
                 )
-                print(archive_file)
                 if not ega_util.check_file(archive_file):
                     print(f"Downloading {source_file}")
                     run_wget = subprocess.run(

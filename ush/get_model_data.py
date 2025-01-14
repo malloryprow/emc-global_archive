@@ -32,6 +32,7 @@ Condition codes: 0 for success, 1 for failure
 import os
 import sys
 import datetime
+import subprocess
 import emc_global_archive_util as ega_util
 
 print("\nBEGIN: "+sys.argv[0]+" at "+str(datetime.datetime.today())+"\n")
@@ -1262,6 +1263,64 @@ elif run_settings_dict['MODEL'] == 'ukm':
             if run_settings_dict['SENDARCH'] == 'YES':
                 ega_util.link_file(source_file, archive_file)
                 ega_util.check_file(archive_file)
+elif run_settings_dict['MODEL'] == 'graphcastgfs':
+    for PDYm_key in list(PDYm_dict.keys()):
+        PDYm = PDYm_dict[PDYm_key]
+        CDATE = PDYm+run_settings_dict['CYCLE'].zfill(2)
+        aws_url = os.path.join(
+            'https://noaa-nws-graphcastgfs-pds.s3.amazonaws.com',
+            f"graphcastgfs.{PDYm}", CDATE[-2:]
+        )
+        for file_levels_num in ['13', '13_test']:
+            model_run_dir = os.path.join(base_model_run_dir, file_levels_num,
+                                         CDATE)
+            if not os.path.exists(model_run_dir):
+                print("Making directory "+model_run_dir)
+                os.makedirs(model_run_dir)
+            os.chdir(model_run_dir)
+            print("In run directory: "+model_run_dir)
+            file_levels_num_model_archive_dir = os.path.join(
+                model_archive_dir, f"graphcastgfs{file_levels_num}",
+                f"graphcastgfs.{PDYm}", CDATE[-2:]
+            )
+            if not os.path.exists(file_levels_num_model_archive_dir):
+                print("Making directory "+file_levels_num_model_archive_dir)
+                os.makedirs(file_levels_num_model_archive_dir)
+            # Set AWS URL for date and cycle
+            if file_levels_num == '13_test':
+                aws_file_levels_num_url = os.path.join(
+                    aws_url, 'forecasts_13_levels_test'
+                )
+            else:
+                aws_file_levels_num_url = os.path.join(
+                    aws_url,
+                    f"forecasts_{file_levels_num}_levels"
+                )
+            fhr = int(run_settings_dict['FHR_MIN'])
+            while fhr <= int(run_settings_dict['FHR_MAX']):
+                fhr3 = str(fhr).zfill(3)
+                source_file = os.path.join(
+                    aws_file_levels_num_url,
+                    f"graphcastgfs.t{CDATE[-2:]}z.pgrb2.0p25.f{fhr3}"
+                )
+                archive_file = os.path.join(
+                    file_levels_num_model_archive_dir,
+                    source_file.rpartition('/')[2]
+                )
+                print(archive_file)
+                if not ega_util.check_file(archive_file):
+                    print(f"Downloading {source_file}")
+                    run_wget = subprocess.run(
+                        ['wget', source_file], capture_output=True
+                    )
+                    if int(run_wget.returncode) != 0:
+                        print(run_wget)
+                    if run_settings_dict['SENDARCH'] == 'YES':
+                        ega_util.copy_file(
+                            source_file.rpartition('/')[2], archive_file,
+                        )
+                        ega_util.check_file(archive_file)
+                fhr+=int(run_settings_dict['FHR_INC'])
 else:
     print(run_settings_dict['MODEL']+" not recongized")
     sys.exit(1)

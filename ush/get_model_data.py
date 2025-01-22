@@ -389,6 +389,10 @@ elif run_settings_dict['MODEL'] == 'ecm':
         )
         fhr = int(run_settings_dict['FHR_MIN'])
         while fhr <= int(run_settings_dict['FHR_MAX']):
+            if fhr == 0:
+                fhr_wgrib = 'anl'
+            else:
+                fhr_wgrib = str(fhr)
             fhr2 = str(fhr).zfill(2)
             fhr3 = str(fhr).zfill(3)
             VDATE_dt = (datetime.datetime.strptime(CDATE, '%Y%m%d%H')
@@ -406,7 +410,13 @@ elif run_settings_dict['MODEL'] == 'ecm':
             tmp_file = os.path.join(model_run_dir, 'tmp.f'+fhr3+'.'+CDATE)
             if not ega_util.check_file(archive_file):
                 if not ega_util.check_file(tmp_file):
-                    ega_util.copy_file(source_file, tmp_file)
+                    if ega_util.check_file(source_file):
+                        ega_util.run_shell_command(
+                            [run_settings_dict['WGRIB']+' '+source_file+' | '
+                             +'grep ":'+fhr_wgrib+'" | '
+                             +run_settings_dict['WGRIB']+' '+source_file+' -i '
+                             +'-grib -o '+tmp_file]
+                        )
                 if ega_util.check_file(tmp_file):
                     ega_util.set_rstprod_permissions(tmp_file)
                     ega_util.run_shell_command(
@@ -431,7 +441,13 @@ elif run_settings_dict['MODEL'] == 'ecm':
             tmp_file = os.path.join(model_run_dir, 'tmp.f000.'+PDYm+cycx)
             if not ega_util.check_file(archive_file):
                 if not ega_util.check_file(tmp_file):
-                    ega_util.copy_file(source_file, tmp_file)
+                    if ega_util.check_file(source_file):
+                        ega_util.run_shell_command(
+                            [run_settings_dict['WGRIB']+' '+source_file+' | '
+                             +'grep ":anl" | '
+                             +run_settings_dict['WGRIB']+' '+source_file+' -i '
+                             +'-grib -o '+tmp_file]
+                        )
                 if ega_util.check_file(tmp_file):
                     ega_util.set_rstprod_permissions(tmp_file)
                     ega_util.run_shell_command(

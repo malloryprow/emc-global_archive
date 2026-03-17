@@ -472,7 +472,7 @@ elif run_settings_dict['MODEL'] == 'gfs':
                     +'.grib2'
                 )
                 if not ega_util.check_file(archive_file):
-                    if not ega_util.check_file(source_file):
+                    if ega_util.check_file(source_file):
                         ega_util.run_shell_command(
                             [run_settings_dict['WGRIB2'], source_file,
                              '-match', '"(:PRATE:surface:)|'

@@ -184,7 +184,7 @@ model_archive_dir = os.path.join(
 )
 if os.path.exists(model_archive_dir):
     if run_settings_dict['MODEL'] not in ['ecmg4']:
-        check_file_list.append('pgbanl.'+run_settings_dict['MODEL']+'.'+CDATE)
+        check_file_list.append('pgbanl.'+run_settings_dict['MODEL']+'.'+CDATE+'.grib2')
     if run_settings_dict['MODEL'] == 'ecm' \
             and run_settings_dict['CYCLE'].zfill(2) in ['06', '18']:
         run_settings_dict['FHR_MAX'] = '00'
@@ -195,18 +195,18 @@ if os.path.exists(model_archive_dir):
             check_file_list.append('flxf'+fhr2+'.ecm.'+CDATE)
         else:
             check_file_list.append(
-                'pgbf'+fhr2+'.'+run_settings_dict['MODEL']+'.'+CDATE
+                'pgbf'+fhr2+'.'+run_settings_dict['MODEL']+'.'+CDATE+'.grib2')
             )
         if run_settings_dict['MODEL'] == 'gfs' and fhr <= 240:
-            check_file_list.append('flxf'+fhr2+'.gfs.'+CDATE)
+            check_file_list.append('flxf'+fhr2+'.gfs.'+CDATE+'.grib2')
         if run_settings_dict['MODEL'] == 'gfs' and fhr >=240:
             fhr+=12
         else:
             fhr+=int(run_settings_dict['FHR_INC'])
     if run_settings_dict['MODEL'] == 'gfs':
-        check_file_list.append('pgbanl.gdas.'+CDATE)
-        check_file_list.append('pgbf00.gdas.'+CDATE)
-        check_file_list.append('pgbf06.gdas.'+CDATE)
+        check_file_list.append('pgbanl.gdas.'+CDATE+'.grib2')
+        check_file_list.append('pgbf00.gdas.'+CDATE+'.grib2')
+        check_file_list.append('pgbf06.gdas.'+CDATE+'.grib2')
         check_file_list.append('atcfunix.gfs.'+CDATE)
     for check_file in check_file_list:
         archive_file = os.path.join(model_archive_dir, check_file)

@@ -176,7 +176,7 @@ if nYEARMON_files != 0:
          os.path.join(model_hpss_dir,
                       run_settings_dict['MODEL']+run_settings_dict['CYCLE']+'_'
                       +run_settings_dict['YEARMON']+'.tar'),
-         '*'+run_settings_dict['YEARMON']+'*'+run_settings_dict['CYCLE']]
+         '*'+run_settings_dict['YEARMON']+'*'+run_settings_dict['CYCLE']+'*']
     )
     if run_settings_dict['MODEL'] in ['ecm', 'ecmg4']:
         ega_util.run_shell_command(

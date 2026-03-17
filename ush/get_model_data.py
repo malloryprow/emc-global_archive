@@ -218,160 +218,8 @@ os.chdir(base_model_run_dir)
 print("In run directory: "+base_model_run_dir)
 
 # Get model data
-# cdas - GFS version used for the NCEP/NCAR Reanalysis Project
-if run_settings_dict['MODEL'] == 'cdas':
-    for PDYm_key in list(PDYm_dict.keys()):
-        PDYm = PDYm_dict[PDYm_key]
-        PDYm_YYYYmm = PDYm[0:6]
-        CDATE = PDYm+run_settings_dict['CYCLE'].zfill(2)
-        model_run_dir = os.path.join(base_model_run_dir, CDATE)
-        if not os.path.exists(model_run_dir):
-            print("Making directory "+model_run_dir)
-            os.makedirs(model_run_dir)
-        os.chdir(model_run_dir)
-        print("In run directory: "+model_run_dir)
-        model_prod_path = os.path.join(
-            run_settings_dict['COMROOT'], run_settings_dict['MODEL'],
-            run_settings_dict['cdas_ver'], 'cdas.'+PDYm_YYYYmm
-        )
-        fhr = int(run_settings_dict['FHR_MIN'])
-        while fhr <= int(run_settings_dict['FHR_MAX']):
-            fhr2 = str(fhr).zfill(2)
-            run_file = os.path.join(
-                model_run_dir, 'pgbf'+fhr2+'.cdas.'+CDATE
-            )
-            archive_file = os.path.join(
-                model_archive_dir, 'pgbf'+fhr2+'.cdas.'+CDATE
-            )
-            source_file = os.path.join(
-                model_prod_path, 'pgb.f'+fhr2+CDATE
-            )
-            if not ega_util.check_file(archive_file):
-                ega_util.copy_file(source_file, run_file)
-                if run_settings_dict['SENDARCH'] == 'YES':
-                    ega_util.copy_file(run_file, archive_file)
-                    ega_util.check_file(archive_file)
-            fhr+=int(run_settings_dict['FHR_INC'])
-        run_file = os.path.join(
-            model_run_dir, 'pgbanl.cdas.'+CDATE
-        )
-        archive_file = os.path.join(
-            model_archive_dir, 'pgbanl.cdas.'+CDATE
-        )
-        source_file = os.path.join(
-            model_archive_dir, 'pgbf00.cdas.'+CDATE
-        )
-        if not ega_util.check_file(archive_file):
-            if run_settings_dict['SENDARCH'] == 'YES':
-                ega_util.link_file(source_file, archive_file)
-                ega_util.check_file(archive_file)
-# cfsr - Legacy GFS used for Climate Forecast System Reanalysis
-elif run_settings_dict['MODEL'] == 'cfsr':
-    for PDYm_key in list(PDYm_dict.keys()):
-        PDYm = PDYm_dict[PDYm_key]
-        CDATE = PDYm+run_settings_dict['CYCLE'].zfill(2)
-        CDATE_YYYY = CDATE[0:4]
-        model_run_dir = os.path.join(base_model_run_dir, CDATE)
-        if not os.path.exists(model_run_dir):
-            print("Making directory "+model_run_dir)
-            os.makedirs(model_run_dir)
-        os.chdir(model_run_dir)
-        print("In run directory: "+model_run_dir)
-        model_prod_path = os.path.join(
-            run_settings_dict['COMROOT'], 'cfs',
-            run_settings_dict['cfs_ver'], 'cfs.'+PDYm,
-            run_settings_dict['CYCLE'].zfill(2), '6hrly_grib_01'
-        )
-        fhr = int(run_settings_dict['FHR_MIN'])
-        while fhr <= int(run_settings_dict['FHR_MAX']):
-            fhr2 = str(fhr).zfill(2)
-            run_file = os.path.join(
-               model_run_dir, 'pgbf'+fhr2+'.cfsr.'+CDATE
-            )
-            archive_file = os.path.join(
-               model_archive_dir, 'pgbf'+fhr2+'.cfsr.'+CDATE
-            )
-            VDATE_dt = (datetime.datetime.strptime(CDATE, '%Y%m%d%H')
-                        +datetime.timedelta(hours=fhr))
-            source_file = os.path.join(
-                model_prod_path,
-                'pgbf'+VDATE_dt.strftime('%Y%m%d%H')+'.01.'+CDATE+'.grb2'
-            )
-            if not ega_util.check_file(archive_file):
-                ega_util.copy_file(source_file, run_file)
-                if run_settings_dict['SENDARCH'] == 'YES':
-                    ega_util.copy_file(run_file, archive_file)
-                    ega_util.check_file(archive_file)
-            fhr+=int(run_settings_dict['FHR_INC'])
-        run_file = os.path.join(
-            model_run_dir, 'pgbanl.cfsr.'+CDATE
-        )
-        archive_file = os.path.join(
-            model_archive_dir, 'pgbanl.cfsr.'+CDATE
-        )
-        source_file = os.path.join(
-            run_settings_dict['COMROOT'], 'cfs',
-            run_settings_dict['cfs_ver'], 'cdas.'+PDYm,
-            'cdas1.t'+run_settings_dict['CYCLE'].zfill(2)+'z.pgrblanl'
-        )
-        if not ega_util.check_file(archive_file):
-            ega_util.copy_file(source_file, run_file)
-            if run_settings_dict['SENDARCH'] == 'YES':
-                ega_util.copy_file(run_file, archive_file)
-                ega_util.check_file(archive_file)
-# cmc - Operational Canadian Meteorological Center
-elif run_settings_dict['MODEL'] == 'cmc':
-    for PDYm_key in list(PDYm_dict.keys()):
-        PDYm = PDYm_dict[PDYm_key]
-        CDATE = PDYm+run_settings_dict['CYCLE'].zfill(2)
-        model_run_dir = os.path.join(base_model_run_dir, CDATE)
-        if not os.path.exists(model_run_dir):
-            print("Making directory "+model_run_dir)
-            os.makedirs(model_run_dir)
-        os.chdir(model_run_dir)
-        print("In run directory: "+model_run_dir)
-        model_prod_path = os.path.join(
-            run_settings_dict['COMROOT'], run_settings_dict['MODEL'],
-            run_settings_dict['cmc_ver'], 'cmc.'+PDYm
-        )
-        fhr = int(run_settings_dict['FHR_MIN'])
-        while fhr <= int(run_settings_dict['FHR_MAX']):
-            fhr2 = str(fhr).zfill(2)
-            fhr3 = str(fhr).zfill(3)
-            run_file = os.path.join(
-                model_run_dir, 'pgbf'+fhr2+'.cmc.'+CDATE
-            )
-            archive_file = os.path.join(
-                model_archive_dir, 'pgbf'+fhr2+'.cmc.'+CDATE
-            )
-            source_file = os.path.join(
-                model_prod_path, 'cmc_'+CDATE+'f'+fhr3
-            )
-            if not ega_util.check_file(archive_file):
-                ega_util.copy_file(source_file, run_file)
-                if run_settings_dict['SENDARCH'] == 'YES':
-                    ega_util.copy_file(run_file, archive_file)
-                    ega_util.check_file(archive_file)
-            fhr+=int(run_settings_dict['FHR_INC'])
-        run_file = os.path.join(
-            model_run_dir, 'pgbanl.cmc.'+CDATE
-        )
-        archive_file = os.path.join(
-            model_archive_dir, 'pgbanl.cmc.'+CDATE
-        )
-        source_file = os.path.join(
-            model_archive_dir, 'pgbf00.cmc.'+CDATE
-        )
-        if not ega_util.check_file(archive_file):
-            if run_settings_dict['SENDARCH'] == 'YES':
-                ega_util.link_file(source_file, archive_file)
-                ega_util.check_file(archive_file)
 # ecm - Operational European Center for Medium-Range Weather Forecasts
-elif run_settings_dict['MODEL'] == 'ecm':
-    ECM2NCEPGRIB = os.path.join(
-        run_settings_dict['HOMEemc_global_archive'], 'exec',
-        'ecm_gfs_look_alike_new'
-    )
+if run_settings_dict['MODEL'] == 'ecm':
     for PDYm_key in list(PDYm_dict.keys()):
         PDYm = PDYm_dict[PDYm_key]
         CDATE = PDYm+run_settings_dict['CYCLE'].zfill(2)
@@ -398,30 +246,44 @@ elif run_settings_dict['MODEL'] == 'ecm':
             VDATE_dt = (datetime.datetime.strptime(CDATE, '%Y%m%d%H')
                         +datetime.timedelta(hours=fhr))
             run_file = os.path.join(
-                model_run_dir, 'pgbf'+fhr2+'.ecm.'+CDATE
+                model_run_dir, 'pgbf'+fhr2+'.ecm.'+CDATE+'.grib2'
             )
             archive_file = os.path.join(
-                model_archive_dir, 'pgbf'+fhr2+'.ecm.'+CDATE
+                model_archive_dir, 'pgbf'+fhr2+'.ecm.'+CDATE+'.grib2'
             )
             source_file = os.path.join(
                 model_prod_path,
                 'DCD'+CDATE_mmddHH+'00'+VDATE_dt.strftime('%m%d%H')+'001'
             )
-            tmp_file = os.path.join(model_run_dir, 'tmp.f'+fhr3+'.'+CDATE)
+            tmp_file = os.path.join(model_run_dir, 'tmp.f'+fhr3+'.'+CDATE+'.grib2')
+            tmp2_file = os.path.join(model_run_dir, 'tmp2.f'+fhr3+'.'+CDATE+'.grib2')
             if not ega_util.check_file(archive_file):
-                if not ega_util.check_file(tmp_file):
-                    if ega_util.check_file(source_file):
-                        ega_util.run_shell_command(
-                            [run_settings_dict['WGRIB']+' '+source_file+' | '
-                             +'grep ":'+fhr_wgrib+'" | '
-                             +run_settings_dict['WGRIB']+' '+source_file+' -i '
-                             +'-grib -o '+tmp_file]
-                        )
+                if ega_util.check_file(source_file):
+                    ega_util.run_shell_command(
+                        [run_settings_dict['WGRIB']+' '+source_file+' | '
+                         +'egrep "(:T:|:R:|:GH:|:U:|:V:|:MSL:|:TP:|'
+                         +':2T:|:2D:|:10U:|:10V:)" | '
+                         +run_settings_dict['WGRIB']+' '+source_file+' -i '
+                         +'-grib -o '+tmp_file]
+                    )
                 if ega_util.check_file(tmp_file):
                     ega_util.set_rstprod_permissions(tmp_file)
-                    ega_util.run_shell_command(
-                        [ECM2NCEPGRIB, tmp_file, run_file]
+                    ega_util.convert_grib1_to_grib2(
+                        tmp_file, tmp2_file,
+                        run_settings_dict['CNVGRIB']
                     )
+                if ega_util.check_file(tmp2_file):
+                    ega_util.set_rstprod_permissions(tmp2_file)
+                    ega_util.run_shell_command(
+                         [run_settings_dict['WGRIB2']+' '+tmp2_file+' '
+                          +'-if "(:DPT:surface|:TMP:surface)" -set_lev '
+                          +'"2 m above ground" -fi  -if '
+                          +'"(:VGRD:surface|:UGRD:surface)" -set_lev '
+                          +'"10 m above ground" -fi -grib '
+                          +run_file]
+                    )
+                if ega_util.check_file(run_file):
+                    ega_util.set_rstprod_permissions(run_file)
                     if run_settings_dict['SENDARCH'] == 'YES':
                         ega_util.copy_file(run_file, archive_file)
                         if ega_util.check_file(archive_file):
@@ -429,42 +291,57 @@ elif run_settings_dict['MODEL'] == 'ecm':
             fhr+=int(run_settings_dict['FHR_INC'])
         for cycx in ['00', '06', '12', '18']:
             run_file = os.path.join(
-                model_run_dir, 'pgbf00.ecm.'+PDYm+cycx
+                model_run_dir, 'pgbf00.ecm.'+PDYm+cycx+'.grib2'
             )
             archive_file = os.path.join(
-                model_archive_dir, 'pgbf00.ecm.'+PDYm+cycx
+                model_archive_dir, 'pgbf00.ecm.'+PDYm+cycx+'.grib2'
             )
             source_file = os.path.join(
                 model_prod_path,
                 'DCD'+CDATE_mmdd+cycx+'00'+CDATE_mmdd+cycx+'001'
             )
-            tmp_file = os.path.join(model_run_dir, 'tmp.f000.'+PDYm+cycx)
+            tmp_file = os.path.join(model_run_dir, 'tmp.f000.'+PDYm+cycx)+'.grib2'
+            tmp2_file = os.path.join(model_run_dir, 'tmp2.f000.'+PDYm+cycx)+'.grib2'
             if not ega_util.check_file(archive_file):
-                if not ega_util.check_file(tmp_file):
-                    if ega_util.check_file(source_file):
-                        ega_util.run_shell_command(
-                            [run_settings_dict['WGRIB']+' '+source_file+' | '
-                             +'grep ":anl" | '
-                             +run_settings_dict['WGRIB']+' '+source_file+' -i '
-                             +'-grib -o '+tmp_file]
-                        )
+                if ega_util.check_file(source_file):
+                    ega_util.run_shell_command(
+                        [run_settings_dict['WGRIB']+' '+source_file+' | '
+                         +'egrep "(:T:|:R:|:GH:|:U:|:V:|:MSL:|:TP:|'
+                         +':2T:|:2D:|:10U:|:10V:)" | '
+                         +run_settings_dict['WGRIB']+' '+source_file+' -i '
+                         +'-grib -o '+tmp_file]
+                    )
                 if ega_util.check_file(tmp_file):
                     ega_util.set_rstprod_permissions(tmp_file)
-                    ega_util.run_shell_command(
-                        [ECM2NCEPGRIB, tmp_file, run_file]
+                    ega_util.convert_grib1_to_grib2(
+                        tmp_file, tmp2_file,
+                        run_settings_dict['CNVGRIB']
                     )
-                if run_settings_dict['SENDARCH'] == 'YES':
-                    ega_util.copy_file(run_file, archive_file)
-                    if ega_util.check_file(archive_file):
-                        ega_util.set_rstprod_permissions(archive_file)
+                if ega_util.check_file(tmp2_file):
+                    ega_util.set_rstprod_permissions(tmp2_file)
+                    ega_util.run_shell_command(
+                         [run_settings_dict['WGRIB2']+' '+tmp2_file+' '
+                          +'-if "(:DPT:surface|:TMP:surface)" -set_lev '
+                          +'"2 m above ground" -fi  -if '
+                          +'"(:VGRD:surface|:UGRD:surface)" -set_lev '
+                          +'"10 m above ground" -fi -grib '
+                          +run_file]
+                    )
+                if ega_util.check_file(run_file):
+                    ega_util.set_rstprod_permissions(run_file)
+                    if run_settings_dict['SENDARCH'] == 'YES':
+                        ega_util.copy_file(run_file, archive_file)
+                        if ega_util.check_file(archive_file):
+                            ega_util.set_rstprod_permissions(archive_file)
+                
             run_file = os.path.join(
-                model_run_dir, 'pgbanl.ecm.'+PDYm+cycx
+                model_run_dir, 'pgbanl.ecm.'+PDYm+cycx+'.grib2'
             )
             archive_file = os.path.join(
-                model_archive_dir, 'pgbanl.ecm.'+PDYm+cycx
+                model_archive_dir, 'pgbanl.ecm.'+PDYm+cycx+'.grib2'
             )
             source_file = os.path.join(
-                model_archive_dir, 'pgbf00.ecm.'+PDYm+cycx
+                model_archive_dir, 'pgbf00.ecm.'+PDYm+cycx+'.grib2'
             )
             if not ega_util.check_file(archive_file):
                 if run_settings_dict['SENDARCH'] == 'YES':
@@ -549,182 +426,6 @@ elif run_settings_dict['MODEL'] == 'ecmg4':
                     if ega_util.check_file(archive_file):
                         ega_util.set_rstprod_permissions(archive_file)
             fhr+=int(run_settings_dict['FHR_INC'])
-# fno -  Operational U.S. Navy Fleet Numerical Meteorology and Oceanograpy Center
-elif run_settings_dict['MODEL'] == 'fno':
-    model_prod_path = os.path.join(
-        run_settings_dict['DCOMROOT'], 'navgem'
-    )
-    for PDYm_key in list(PDYm_dict.keys()):
-        PDYm = PDYm_dict[PDYm_key]
-        CDATE = PDYm+run_settings_dict['CYCLE'].zfill(2)
-        model_run_dir = os.path.join(base_model_run_dir, CDATE)
-        if not os.path.exists(model_run_dir):
-            print("Making directory "+model_run_dir)
-            os.makedirs(model_run_dir)
-        os.chdir(model_run_dir)
-        print("In run directory: "+model_run_dir)
-        fhr = int(run_settings_dict['FHR_MIN'])
-        while fhr <= int(run_settings_dict['FHR_MAX']):
-            fhr2 = str(fhr).zfill(2)
-            fhr3 = str(fhr).zfill(3)
-            run_file = os.path.join(
-                model_run_dir, 'pgbf'+fhr2+'.fno.'+CDATE
-            )
-            archive_file = os.path.join(
-                model_archive_dir, 'pgbf'+fhr2+'.fno.'+CDATE
-            )
-            source_file = os.path.join(
-                model_prod_path, 'US058GMET-OPSbd2.NAVGEM'+fhr3+'-'+CDATE
-                +'-NOAA-halfdeg.gr2'
-            )
-            tmp1_file = os.path.join(model_run_dir, 'tmp.f'+fhr3+'.'+CDATE)
-            tmp2_file = os.path.join(
-                model_run_dir, 'tmp.grib1.f'+fhr3+'.'+CDATE
-            )
-            if not ega_util.check_file(archive_file):
-                if not ega_util.check_file(tmp1_file):
-                    ega_util.copy_file(source_file, tmp1_file)
-                if ega_util.check_file(tmp1_file):
-                    if not ega_util.check_file(tmp2_file):
-                        ega_util.convert_grib2_to_grib1(
-                            tmp1_file, tmp2_file,
-                            run_settings_dict['CNVGRIB']
-                        )
-                    if ega_util.check_file(tmp2_file):
-                        ega_util.regrid_copygb(
-                            tmp2_file, run_file, '3',
-                            run_settings_dict['COPYGB']
-                        )
-                if run_settings_dict['SENDARCH'] == 'YES':
-                    ega_util.copy_file(run_file, archive_file)
-                    ega_util.check_file(archive_file)
-            fhr+=int(run_settings_dict['FHR_INC'])
-        run_file = os.path.join(
-            model_run_dir, 'pgbanl.fno.'+CDATE
-        )
-        archive_file = os.path.join(
-            model_archive_dir, 'pgbanl.fno.'+CDATE
-        )
-        source_file = os.path.join(
-            model_archive_dir, 'pgbf00.fno.'+CDATE
-        )
-        if not ega_util.check_file(archive_file):
-            if run_settings_dict['SENDARCH'] == 'YES':
-                ega_util.link_file(source_file, archive_file)
-                ega_util.check_file(archive_file)
-# gefsc - Operational Global Ensemble Forecast System - Control
-elif run_settings_dict['MODEL'] == 'gefsc':
-    for PDYm_key in list(PDYm_dict.keys()):
-        PDYm = PDYm_dict[PDYm_key]
-        CDATE = PDYm+run_settings_dict['CYCLE'].zfill(2)
-        model_run_dir = os.path.join(base_model_run_dir, CDATE)
-        if not os.path.exists(model_run_dir):
-            print("Making directory "+model_run_dir)
-            os.makedirs(model_run_dir)
-        os.chdir(model_run_dir)
-        print("In run directory: "+model_run_dir)
-        model_prod_path = os.path.join(
-            run_settings_dict['COMROOT'], 'gefs',
-            run_settings_dict['gefs_ver'], 'gefs.'+PDYm,
-            run_settings_dict['CYCLE'].zfill(2), 'atmos', 'pgrb2ap5'
-        )
-        fhr = int(run_settings_dict['FHR_MIN'])
-        while fhr <= int(run_settings_dict['FHR_MAX']):
-            fhr2 = str(fhr).zfill(2)
-            fhr3 = str(fhr).zfill(3)
-            run_file = os.path.join(
-                model_run_dir, 'pgbf'+fhr2+'.gefsc.'+CDATE
-            )
-            archive_file = os.path.join(
-                model_archive_dir, 'pgbf'+fhr2+'.gefsc.'+CDATE
-            )
-            source_file = os.path.join(
-                model_prod_path, 'gec00.t'+run_settings_dict['CYCLE'].zfill(2)
-                +'z.pgrb2a.0p50.f'+fhr3
-            )
-            tmp_file = os.path.join(model_run_dir, 'tmp.f'+fhr3+'.'+CDATE)
-            if not ega_util.check_file(archive_file):
-                if not ega_util.check_file(tmp_file):
-                    ega_util.copy_file(source_file, tmp_file)
-                if ega_util.check_file(tmp_file):
-                    ega_util.convert_grib2_to_grib1(
-                        tmp_file, run_file,
-                        run_settings_dict['CNVGRIB']
-                    )
-                    if run_settings_dict['SENDARCH'] == 'YES':
-                        ega_util.link_file(run_file, archive_file)
-                        ega_util.check_file(archive_file)
-            fhr+=int(run_settings_dict['FHR_INC'])
-        run_file = os.path.join(
-            model_run_dir, 'pgbanl.gefsc.'+CDATE
-        )
-        archive_file = os.path.join(
-            model_archive_dir, 'pgbanl.gefsc.'+CDATE
-        )
-        source_file = os.path.join(
-            model_archive_dir, 'pgbf00.gefsc.'+CDATE
-        )
-        if not ega_util.check_file(archive_file):
-            if run_settings_dict['SENDARCH'] == 'YES':
-                ega_util.link_file(source_file, archive_file)
-                ega_util.check_file(archive_file)
-# gefsm - Operational Global Ensemble Forecast System - Mean
-elif run_settings_dict['MODEL'] == 'gefsm':
-    for PDYm_key in list(PDYm_dict.keys()):
-        PDYm = PDYm_dict[PDYm_key]
-        CDATE = PDYm+run_settings_dict['CYCLE'].zfill(2)
-        model_run_dir = os.path.join(base_model_run_dir, CDATE)
-        if not os.path.exists(model_run_dir):
-            print("Making directory "+model_run_dir)
-            os.makedirs(model_run_dir)
-        os.chdir(model_run_dir)
-        print("In run directory: "+model_run_dir)
-        model_prod_path = os.path.join(
-            run_settings_dict['COMROOT'], 'gefs',
-            run_settings_dict['gefs_ver'], 'gefs.'+PDYm,
-            run_settings_dict['CYCLE'].zfill(2), 'atmos', 'pgrb2ap5'
-        )
-        fhr = int(run_settings_dict['FHR_MIN'])
-        while fhr <= int(run_settings_dict['FHR_MAX']):
-            fhr2 = str(fhr).zfill(2)
-            fhr3 = str(fhr).zfill(3)
-            run_file = os.path.join(
-                model_run_dir, 'pgbf'+fhr2+'.gefsm.'+CDATE
-            )
-            archive_file = os.path.join(
-                model_archive_dir, 'pgbf'+fhr2+'.gefsm.'+CDATE
-            )
-            source_file = os.path.join(
-                model_prod_path, 'geavg.t'+run_settings_dict['CYCLE'].zfill(2)
-                +'z.pgrb2a.0p50.f'+fhr3
-            )
-            tmp_file = os.path.join(model_run_dir, 'tmp.f'+fhr3+'.'+CDATE)
-            if not ega_util.check_file(archive_file):
-                if not ega_util.check_file(tmp_file):
-                    ega_util.copy_file(source_file, tmp_file)
-                if ega_util.check_file(tmp_file):
-                    ega_util.convert_grib2_to_grib1(
-                        tmp_file, run_file,
-                        run_settings_dict['CNVGRIB']
-                    )
-                    if run_settings_dict['SENDARCH'] == 'YES':
-                        ega_util.copy_file(run_file, archive_file)
-                        ega_util.check_file(archive_file)
-            fhr+=int(run_settings_dict['FHR_INC'])
-        run_file = os.path.join(
-            model_run_dir, 'pgbanl.gefsm.'+CDATE
-        )
-        archive_file = os.path.join(
-            model_archive_dir, 'pgbanl.gefsm.'+CDATE
-        )
-        source_file = os.path.join(
-            run_settings_dict['ARCHIVE_DIR'], 'gfs',
-            'pgbanl.gfs.'+CDATE
-        )
-        if not ega_util.check_file(archive_file):
-            if run_settings_dict['SENDARCH'] == 'YES':
-                ega_util.link_file(source_file, archive_file)
-                ega_util.check_file(archive_file)
 elif run_settings_dict['MODEL'] == 'gfs':
     for PDYm_key in list(PDYm_dict.keys()):
         PDYm = PDYm_dict[PDYm_key]
@@ -745,64 +446,39 @@ elif run_settings_dict['MODEL'] == 'gfs':
             fhr2 = str(fhr).zfill(2)
             fhr3 = str(fhr).zfill(3)
             run_file = os.path.join(
-                model_run_dir, 'pgbf'+fhr2+'.gfs.'+CDATE
+                model_run_dir, 'pgbf'+fhr2+'.gfs.'+CDATE+'.grib2'
             )
             archive_file = os.path.join(
-                model_archive_dir, 'pgbf'+fhr2+'.gfs.'+CDATE
+                model_archive_dir, 'pgbf'+fhr2+'.gfs.'+CDATE+'.grib2'
             )
             source_file = os.path.join(
                 model_prod_path, 'gfs.t'+run_settings_dict['CYCLE'].zfill(2)
                 +'z.pgrb2.1p00.f'+fhr3
             )
-            tmp_file = os.path.join(
-                model_run_dir, 'tmp.pgrb2.1p00.gfs.f'+fhr3+'.'+CDATE
-            )
             if not ega_util.check_file(archive_file):
-                if not ega_util.check_file(tmp_file):
-                    ega_util.copy_file(source_file, tmp_file)
-                if ega_util.check_file(tmp_file):
-                    ega_util.convert_grib2_to_grib1(
-                        tmp_file, run_file,
-                        run_settings_dict['CNVGRIB']
-                    )
-                    if run_settings_dict['SENDARCH'] == 'YES':
-                        ega_util.copy_file(run_file, archive_file)
-                        ega_util.check_file(archive_file)
+                if run_settings_dict['SENDARCH'] == 'YES':
+                    ega_util.copy_file(source_file, archive_file)
+                    ega_util.check_file(archive_file)
             if fhr <= 240:
                 run_file = os.path.join(
-                    model_run_dir, 'flxf'+fhr2+'.gfs.'+CDATE
+                    model_run_dir, 'flxf'+fhr2+'.gfs.'+CDATE+'.grib2'
                 )
                 archive_file = os.path.join(
-                    model_archive_dir, 'flxf'+fhr2+'.gfs.'+CDATE
+                    model_archive_dir, 'flxf'+fhr2+'.gfs.'+CDATE+'.grib2'
                 )
                 source_file = os.path.join(
                     model_prod_path, 'gfs.t'
                     +run_settings_dict['CYCLE'].zfill(2)+'z.sfluxgrbf'+fhr3
                     +'.grib2'
                 )
-                tmp1_file = os.path.join(
-                    model_run_dir, 'tmp.sfluxgrb.gfs.f'+fhr3+'.'+CDATE
-                )
-                tmp2_file = os.path.join(
-                    model_run_dir, 'tmp.sfluxgrb.gfs.PRATE.2mTMP.f'
-                    +fhr3+'.'+CDATE
-                )
                 if not ega_util.check_file(archive_file):
-                    if not ega_util.check_file(tmp1_file):
-                        ega_util.copy_file(source_file, tmp1_file)
-                    if ega_util.check_file(tmp1_file):
-                        if not ega_util.check_file(tmp2_file):
-                            ega_util.run_shell_command(
-                                [run_settings_dict['WGRIB2'], tmp1_file,
-                                 '-match', '"(:PRATE:surface:)|'
-                                 +'(:TMP:2 m above ground:)"', '-grib',
-                                 tmp2_file]
-                            )
-                        if ega_util.check_file(tmp2_file):
-                            ega_util.convert_grib2_to_grib1(
-                                tmp2_file, run_file,
-                                run_settings_dict['CNVGRIB']
-                            )
+                    if not ega_util.check_file(source_file):
+                        ega_util.run_shell_command(
+                            [run_settings_dict['WGRIB2'], source_file,
+                             '-match', '"(:PRATE:surface:)|'
+                             +'(:TMP:2 m above ground:)"', '-grib',
+                             run_file]
+                        )
                         if run_settings_dict['SENDARCH'] == 'YES':
                             ega_util.copy_file(run_file, archive_file)
                             ega_util.check_file(archive_file)
@@ -811,28 +487,18 @@ elif run_settings_dict['MODEL'] == 'gfs':
             else:
                 fhr+=int(run_settings_dict['FHR_INC'])
         run_file = os.path.join(
-            model_run_dir, 'pgbanl.gfs.'+CDATE
+            model_run_dir, 'pgbanl.gfs.'+CDATE+'.grib2'
         ) 
         archive_file = os.path.join(
-            model_archive_dir, 'pgbanl.gfs.'+CDATE
+            model_archive_dir, 'pgbanl.gfs.'+CDATE+'.grib2'
         )
         source_file = os.path.join(
             model_prod_path, 'gfs.t'+run_settings_dict['CYCLE'].zfill(2)
             +'z.pgrb2.1p00.anl'
         )
-        tmp_file = os.path.join(
-            model_run_dir, 'tmp.pgrb2.1p00.gfs.anl.'+CDATE
-        )
         if not ega_util.check_file(archive_file):
-            if not ega_util.check_file(tmp_file):
-                ega_util.copy_file(source_file, tmp_file)
-            if ega_util.check_file(tmp_file):
-                ega_util.convert_grib2_to_grib1(
-                    tmp_file, run_file,
-                    run_settings_dict['CNVGRIB']
-                )
             if run_settings_dict['SENDARCH'] == 'YES':
-                ega_util.copy_file(run_file, archive_file)
+                ega_util.copy_file(source_file, archive_file)
                 ega_util.check_file(archive_file)
         for fs in ['anl', 'f000', 'f006']:
             source_file = os.path.join(
@@ -844,31 +510,21 @@ elif run_settings_dict['MODEL'] == 'gfs':
             )
             if fs != 'anl':
                 run_file = os.path.join(
-                    model_run_dir, 'pgbf'+fs[2:]+'.gdas.'+CDATE
+                    model_run_dir, 'pgbf'+fs[2:]+'.gdas.'+CDATE+'.grib2'
                 )
                 archive_file = os.path.join(
-                    model_archive_dir, 'pgbf'+fs[2:]+'.gdas.'+CDATE
+                    model_archive_dir, 'pgbf'+fs[2:]+'.gdas.'+CDATE+'.grib2'
                 )
             else:
                 run_file = os.path.join(
-                    model_run_dir, 'pgb'+fs+'.gdas.'+CDATE
+                    model_run_dir, 'pgb'+fs+'.gdas.'+CDATE+'.grib2'
                 )
                 archive_file = os.path.join(
-                    model_archive_dir, 'pgb'+fs+'.gdas.'+CDATE
+                    model_archive_dir, 'pgb'+fs+'.gdas.'+CDATE+'.grib2'
                 )
-            tmp_file = os.path.join(
-                model_run_dir, 'tmp.pgrb2.1p00.gdas.'+fs+'.'+CDATE
-            )
             if not ega_util.check_file(archive_file):
-                if not ega_util.check_file(tmp_file):
-                    ega_util.copy_file(source_file, tmp_file)
-                if ega_util.check_file(tmp_file):
-                    ega_util.convert_grib2_to_grib1(
-                        tmp_file, run_file,
-                        run_settings_dict['CNVGRIB']
-                    )
                 if run_settings_dict['SENDARCH'] == 'YES':
-                    ega_util.copy_file(run_file, archive_file)
+                    ega_util.copy_file(source_file, archive_file)
                     ega_util.check_file(archive_file)
         source_file = os.path.join(
             run_settings_dict['COMROOT'], 'ens_tracker',
@@ -884,400 +540,8 @@ elif run_settings_dict['MODEL'] == 'gfs':
             model_archive_dir, 'atcfunix.gfs.'+CDATE
         )
         if not ega_util.check_file(archive_file):
-            ega_util.copy_file(source_file, run_file)
             if run_settings_dict['SENDARCH'] == 'YES':
-                ega_util.copy_file(run_file, archive_file)
-                ega_util.check_file(archive_file)
-elif run_settings_dict['MODEL'] == 'gfs_wcoss2_para':
-    for PDYm_key in list(PDYm_dict.keys()):
-        PDYm = PDYm_dict[PDYm_key]
-        CDATE = PDYm+run_settings_dict['CYCLE'].zfill(2)
-        model_run_dir = os.path.join(base_model_run_dir, CDATE)
-        if not os.path.exists(model_run_dir):
-            print("Making directory "+model_run_dir)
-            os.makedirs(model_run_dir)
-        os.chdir(model_run_dir)
-        print("In run directory: "+model_run_dir)
-        model_prod_path = os.path.join(
-            '/lfs/h1/ops/para/com', 'gfs',
-            run_settings_dict['gfs_ver'], 'gfs.'+PDYm,
-            run_settings_dict['CYCLE'].zfill(2), 'atmos'
-        )
-        fhr = int(run_settings_dict['FHR_MIN'])
-        while fhr <= int(run_settings_dict['FHR_MAX']):
-            fhr2 = str(fhr).zfill(2)
-            fhr3 = str(fhr).zfill(3)
-            run_file = os.path.join(
-                model_run_dir, 'pgbf'+fhr2+'.gfs.'+CDATE
-            )
-            archive_file = os.path.join(
-                model_archive_dir, 'pgbf'+fhr2+'.gfs.'+CDATE
-            )
-            source_file = os.path.join(
-                model_prod_path, 'gfs.t'+run_settings_dict['CYCLE'].zfill(2)
-                +'z.pgrb2.1p00.f'+fhr3
-            )
-            tmp_file = os.path.join(
-                model_run_dir, 'tmp.pgrb2.1p00.gfs.f'+fhr3+'.'+CDATE
-            )
-            if not ega_util.check_file(archive_file):
-                if not ega_util.check_file(tmp_file):
-                    ega_util.copy_file(source_file, tmp_file)
-                if ega_util.check_file(tmp_file):
-                    ega_util.convert_grib2_to_grib1(
-                        tmp_file, run_file,
-                        run_settings_dict['CNVGRIB']
-                    )
-                if run_settings_dict['SENDARCH'] == 'YES':
-                    ega_util.copy_file(run_file, archive_file)
-                    ega_util.check_file(archive_file)
-            if fhr <= 240:
-                run_file = os.path.join(
-                    model_run_dir, 'flxf'+fhr2+'.gfs.'+CDATE
-                )
-                archive_file = os.path.join(
-                    model_archive_dir, 'flxf'+fhr2+'.gfs.'+CDATE
-                )
-                source_file = os.path.join(
-                    model_prod_path, 'gfs.t'
-                    +run_settings_dict['CYCLE'].zfill(2)+'z.sfluxgrbf'+fhr3
-                    +'.grib2'
-                )
-                tmp1_file = os.path.join(
-                    model_run_dir, 'tmp.sfluxgrb.gfs.f'+fhr3+'.'+CDATE
-                )
-                tmp2_file = os.path.join(
-                    model_run_dir, 'tmp.sfluxgrb.gfs.PRATE.2mTMP.f'
-                    +fhr3+'.'+CDATE
-                )
-                if not ega_util.check_file(archive_file):
-                    if not ega_util.check_file(tmp1_file):
-                        ega_util.copy_file(source_file, tmp1_file)
-                    if ega_util.check_file(tmp1_file):
-                        if not ega_util.check_file(tmp2_file):
-                            ega_util.run_shell_command(
-                                [run_settings_dict['WGRIB2'], tmp1_file,
-                                 '-match', '"(:PRATE:surface:)|'
-                                 +'(:TMP:2 m above ground:)"', '-grib',
-                                 tmp2_file]
-                            )
-                        if ega_util.check_file(tmp2_file):
-                            ega_util.convert_grib2_to_grib1(
-                                tmp2_file, run_file,
-                                run_settings_dict['CNVGRIB']
-                            )
-                        if run_settings_dict['SENDARCH'] == 'YES':
-                            ega_util.copy_file(run_file, archive_file)
-                            ega_util.check_file(archive_file)
-            if fhr >= 240:
-                fhr+=12
-            else:
-                fhr+=int(run_settings_dict['FHR_INC'])
-        run_file = os.path.join(
-            model_run_dir, 'pgbanl.gfs.'+CDATE
-        )
-        archive_file = os.path.join(
-            model_archive_dir, 'pgbanl.gfs.'+CDATE
-        )
-        source_file = os.path.join(
-            model_prod_path, 'gfs.t'+run_settings_dict['CYCLE'].zfill(2)
-            +'z.pgrb2.1p00.anl'
-        )
-        tmp_file = os.path.join(
-            model_run_dir, 'tmp.pgrb2.1p00.gfs.anl.'+CDATE
-        )
-        if not ega_util.check_file(archive_file):
-            if not ega_util.check_file(tmp_file):
-                ega_util.copy_file(source_file, tmp_file)
-            if ega_util.check_file(tmp_file):
-                ega_util.convert_grib2_to_grib1(
-                    tmp_file, run_file,
-                    run_settings_dict['CNVGRIB']
-                )
-            if run_settings_dict['SENDARCH'] == 'YES':
-                ega_util.copy_file(run_file, archive_file)
-                ega_util.check_file(archive_file)
-        for fs in ['anl', 'f000', 'f006']:
-            source_file = os.path.join(
-                run_settings_dict['COMROOT'], 'gfs',
-                run_settings_dict['gfs_ver'], 'gdas.'+PDYm,
-                run_settings_dict['CYCLE'].zfill(2), 'atmos',
-                'gdas.t'+run_settings_dict['CYCLE'].zfill(2)
-                +'z.pgrb2.1p00.'+fs
-            )
-            if fs != 'anl':
-                run_file = os.path.join(
-                    model_run_dir, 'pgbf'+fs[2:]+'.gdas.'+CDATE
-                )
-                archive_file = os.path.join(
-                    model_archive_dir, 'pgbf'+fs[2:]+'.gdas.'+CDATE
-                )
-            else:
-                run_file = os.path.join(
-                    model_run_dir, 'pgb'+fs+'.gdas.'+CDATE
-                )
-                archive_file = os.path.join(
-                    model_archive_dir, 'pgb'+fs+'.gdas.'+CDATE
-                )
-            tmp_file = os.path.join(
-                model_run_dir, 'tmp.pgrb2.1p00.gdas.'+fs+'.'+CDATE
-            )
-            if not ega_util.check_file(archive_file):
-                if not ega_util.check_file(tmp_file):
-                    ega_util.copy_file(source_file, tmp_file)
-                if ega_util.check_file(tmp_file):
-                    ega_util.convert_grib2_to_grib1(
-                        tmp_file, run_file,
-                        run_settings_dict['CNVGRIB']
-                    )
-                if run_settings_dict['SENDARCH'] == 'YES':
-                    ega_util.copy_file(run_file, archive_file)
-                    ega_util.check_file(archive_file)
-elif run_settings_dict['MODEL'] == 'jma':
-    JMAMERGE = os.path.join(
-        run_settings_dict['HOMEemc_global_archive'], 'exec',
-        'jma_merge'
-    )
-    for PDYm_key in list(PDYm_dict.keys()):
-        PDYm = PDYm_dict[PDYm_key]
-        CDATE = PDYm+run_settings_dict['CYCLE'].zfill(2)
-        model_run_dir = os.path.join(base_model_run_dir, CDATE)
-        if not os.path.exists(model_run_dir):
-            print("Making directory "+model_run_dir)
-            os.makedirs(model_run_dir)
-        os.chdir(model_run_dir)
-        print("In run directory: "+model_run_dir)
-        model_prod_path = os.path.join(
-            run_settings_dict['DCOMROOT'], PDYm, 'wgrbbul'
-        )
-        source_n_file = os.path.join(
-            model_prod_path, 'jma_n_'+run_settings_dict['CYCLE'].zfill(2)
-        )
-        source_s_file = os.path.join(
-            model_prod_path, 'jma_s_'+run_settings_dict['CYCLE'].zfill(2)
-        )
-        tmp_n_file = os.path.join(model_run_dir, 'tmp.n.'+CDATE)
-        tmp_s_file = os.path.join(model_run_dir, 'tmp.s.'+CDATE)
-        fhr = int(run_settings_dict['FHR_MIN'])
-        while fhr <= int(run_settings_dict['FHR_MAX']):
-            fhr2 = str(fhr).zfill(2)
-            fhr3 = str(fhr).zfill(3)
-            run_file = os.path.join(
-                model_run_dir, 'pgbf'+fhr2+'.jma.'+CDATE
-            )
-            archive_file = os.path.join(
-                model_archive_dir, 'pgbf'+fhr2+'.jma.'+CDATE
-            )
-            tmp_n_fhr_file = os.path.join(
-                model_run_dir, 'tmp.n.f'+fhr3+'.'+CDATE
-            )
-            tmp_s_fhr_file = os.path.join(
-                model_run_dir, 'tmp.s.f'+fhr3+'.'+CDATE
-            )
-            if fhr == 0:
-                fhr_file_str = ':anl'
-            else:
-                fhr_file_str = fhr2+'hr'
-            if not ega_util.check_file(archive_file):
-                if not ega_util.check_file(tmp_n_file):
-                    ega_util.copy_file(source_n_file, tmp_n_file)
-                if ega_util.check_file(tmp_n_file):
-                    ega_util.run_shell_command(
-                        [run_settings_dict['WGRIB']+' '+tmp_n_file+' | '
-                         +'grep "'+fhr_file_str+'" | '
-                         +run_settings_dict['WGRIB']+' '+tmp_n_file+' -i '
-                         +'-grib -o '+tmp_n_fhr_file]
-                    )
-                if not ega_util.check_file(tmp_s_file):
-                    ega_util.copy_file(source_s_file, tmp_s_file)
-                if ega_util.check_file(tmp_s_file):
-                    ega_util.run_shell_command(
-                        [run_settings_dict['WGRIB']+' '+tmp_s_file+' | '
-                         +'grep "'+fhr_file_str+'" | '
-                         +run_settings_dict['WGRIB']+' '+tmp_s_file+' -i '
-                         +'-grib -o '+tmp_s_fhr_file]
-                    )
-                if ega_util.check_file(tmp_n_fhr_file) \
-                        and ega_util.check_file(tmp_s_fhr_file):
-                    ega_util.run_shell_command(
-                        [JMAMERGE, tmp_n_fhr_file.rpartition('/')[2],
-                         tmp_s_fhr_file.rpartition('/')[2],
-                         run_file.rpartition('/')[2]]
-                    )
-                if run_settings_dict['SENDARCH'] == 'YES':
-                    ega_util.copy_file(
-                        run_file.rpartition('/')[2], archive_file,
-                    )
-                    ega_util.check_file(archive_file)
-            fhr+=int(run_settings_dict['FHR_INC'])
-        run_file = os.path.join(
-            model_run_dir, 'pgbanl.jma.'+CDATE
-        )
-        archive_file = os.path.join(
-            model_archive_dir, 'pgbanl.jma.'+CDATE
-        )
-        source_file = os.path.join(
-            model_archive_dir, 'pgbf00.jma.'+CDATE
-        )
-        if not ega_util.check_file(archive_file):
-            if run_settings_dict['SENDARCH'] == 'YES':
-                ega_util.link_file(source_file, archive_file)
-                ega_util.check_file(archive_file)
-elif run_settings_dict['MODEL'] == 'ncmrwf':
-    for PDYm_key in list(PDYm_dict.keys()):
-        PDYm = PDYm_dict[PDYm_key]
-        CDATE = PDYm+run_settings_dict['CYCLE'].zfill(2)
-        model_run_dir = os.path.join(base_model_run_dir, CDATE)
-        if not os.path.exists(model_run_dir):
-            print("Making directory "+model_run_dir)
-            os.makedirs(model_run_dir)
-        os.chdir(model_run_dir)
-        print("In run directory: "+model_run_dir)
-        model_prod_path = os.path.join(
-            run_settings_dict['DCOMROOT'], PDYm, 'wgrbbul',
-            'ncmrwf_gdas'
-        )
-        fhr = int(run_settings_dict['FHR_MIN'])
-        while fhr <= int(run_settings_dict['FHR_MAX']):
-            fhr2 = str(fhr).zfill(2)
-            fhr3 = str(fhr).zfill(3)
-            run_file = os.path.join(
-                model_run_dir, 'pgbf'+fhr2+'.ncmrwf.'+CDATE
-            )
-            archive_file = os.path.join(
-                model_archive_dir, 'pgbf'+fhr2+'.ncmrwf.'+CDATE
-            )
-            source_file = os.path.join(
-                model_prod_path, 'gdas1.t'+run_settings_dict['CYCLE'].zfill(2)
-                +'z.grbf'+fhr2
-            )
-            if not ega_util.check_file(archive_file):
-                tmp_file = os.path.join(model_run_dir, 'tmp.f'+fhr3+'.'+CDATE)
-                if not ega_util.check_file(tmp_file):
-                    ega_util.copy_file(source_file, tmp_file)
-                if ega_util.check_file(tmp_file):
-                    ega_util.convert_grib2_to_grib1(
-                        tmp_file, run_file,
-                        run_settings_dict['CNVGRIB']
-                    )
-                if run_settings_dict['SENDARCH'] == 'YES':
-                    ega_util.copy_file(run_file, archive_file)
-                    ega_util.check_file(archive_file)
-            fhr+=int(run_settings_dict['FHR_INC'])
-        run_file = os.path.join(
-            model_run_dir, 'pgbanl.ncmrwf.'+CDATE
-        )
-        archive_file = os.path.join(
-            model_archive_dir, 'pgbanl.ncmrwf.'+CDATE
-        )
-        source_file = os.path.join(
-            model_archive_dir, 'pgbf00.ncmrwf.'+CDATE
-        )
-        if not ega_util.check_file(archive_file):
-            if run_settings_dict['SENDARCH'] == 'YES':
-                ega_util.link_file(source_file, archive_file)
-                ega_util.check_file(archive_file)
-elif run_settings_dict['MODEL'] == 'ukm':
-    UKMHIRESMERGE = os.path.join(
-        run_settings_dict['HOMEemc_global_archive'], 'exec',
-        'ukm_hires_merge'
-    )
-    ukm_lead_id_dict = {
-        '00': 'AAT',
-        '06': 'BBT',
-        '12': 'CCT',
-        '18': 'DDT',
-        '24': 'EET',
-        '30': 'FFT',
-        '36': 'GGT',
-        '42': 'HHT',
-        '48': 'IIT',
-        '54': 'JJT',
-        '60': 'JJT',
-        '66': 'KKT',
-        '72': 'KKT',
-        '78': 'QQT',
-        '84': 'LLT',
-        '90': 'TTT',
-        '96': 'MMT',
-        '102': 'UUT',
-        '108': 'NNT',
-        '114': 'VVT',
-        '120': 'OOT',
-        '126': '11T',
-        '132': 'PPA',
-        '138': '22T',
-        '144': 'PPA'
-    }
-    for PDYm_key in list(PDYm_dict.keys()):
-        PDYm = PDYm_dict[PDYm_key]
-        CDATE = PDYm+run_settings_dict['CYCLE'].zfill(2)
-        model_run_dir = os.path.join(base_model_run_dir, CDATE)
-        if not os.path.exists(model_run_dir):
-            print("Making directory "+model_run_dir)
-            os.makedirs(model_run_dir)
-        os.chdir(model_run_dir)
-        print("In run directory: "+model_run_dir)
-        model_prod_path = os.path.join(
-            run_settings_dict['DCOMROOT'], PDYm, 'wgrbbul',
-            'ukmet_hires'
-        )
-        fhr = int(run_settings_dict['FHR_MIN'])
-        while fhr <= int(run_settings_dict['FHR_MAX']):
-            fhr2 = str(fhr).zfill(2)
-            if fhr2 == '00':
-               fhr_wgrib_str = 'anl'
-            else:
-               fhr_wgrib_str = str(fhr)+'hr'
-            run_file = os.path.join(
-                model_run_dir, 'pgbf'+fhr2+'.ukm.'+CDATE
-            )
-            archive_file = os.path.join(
-                model_archive_dir, 'pgbf'+fhr2+'.ukm.'+CDATE
-            )
-            if fhr2 in list(ukm_lead_id_dict.keys()):
-                source_file = os.path.join(
-                    model_prod_path, 'GAB'+run_settings_dict['CYCLE'].zfill(2)
-                    +ukm_lead_id_dict[fhr2]+'.GRB'
-                )
-                tmp_fhr_file = os.path.join(
-                    model_run_dir, 'tmp.'
-                    +'GAB'+run_settings_dict['CYCLE'].zfill(2)
-                    +ukm_lead_id_dict[fhr2]+'.GRB.f'+str(fhr)
-                )
-                if not ega_util.check_file(archive_file):
-                    if not ega_util.check_file(tmp_fhr_file):
-                        ega_util.run_shell_command(
-                            [run_settings_dict['WGRIB']+' '+source_file+' | '
-                             +'grep "'+fhr_wgrib_str+'" | '
-                             +run_settings_dict['WGRIB']+' '+source_file+' -i '
-                             +'-grib -o '+tmp_fhr_file]
-                        )
-                        #ega_util.copy_file(source_file, tmp_file)
-                    if ega_util.check_file(tmp_fhr_file):
-                        ega_util.run_shell_command(
-                            [UKMHIRESMERGE, tmp_fhr_file.rpartition('/')[2],
-                             run_file.rpartition('/')[2],
-                             str(fhr).zfill(1)]
-                        )
-                    if run_settings_dict['SENDARCH'] == 'YES':
-                        ega_util.copy_file(
-                            run_file.rpartition('/')[2], archive_file,
-                        )
-                        ega_util.check_file(archive_file)
-            fhr+=int(run_settings_dict['FHR_INC'])
-        run_file = os.path.join(
-            model_run_dir, 'pgbanl.ukm.'+CDATE
-        )
-        archive_file = os.path.join(
-            model_archive_dir, 'pgbanl.ukm.'+CDATE
-        )
-        source_file = os.path.join(
-            model_archive_dir, 'pgbf00.ukm.'+CDATE
-        )
-        if not ega_util.check_file(archive_file):
-            if run_settings_dict['SENDARCH'] == 'YES':
-                ega_util.link_file(source_file, archive_file)
+                ega_util.copy_file(source_file, archive_file)
                 ega_util.check_file(archive_file)
 elif run_settings_dict['MODEL'] == 'graphcastgfs':
     for PDYm_key in list(PDYm_dict.keys()):

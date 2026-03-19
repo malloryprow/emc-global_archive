@@ -167,6 +167,8 @@ def link_file(src, dest):
     """
     if os.path.exists(src):
         print("--- LINKING "+src+" TO "+dest)
+        ddir = os.path.dirname(dest)
+        src = os.path.relpath(src, ddir)
         os.symlink(src, dest)
     else:
         print("DOES NOT EXIST "+src)

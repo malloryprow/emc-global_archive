@@ -1279,6 +1279,71 @@ elif run_settings_dict['MODEL'] == 'ukm':
             if run_settings_dict['SENDARCH'] == 'YES':
                 ega_util.link_file(source_file, archive_file)
                 ega_util.check_file(archive_file)
+elif run_settings_dict['MODEL'] == 'eagle_solo':
+    for PDYm_key in list(PDYm_dict.keys()):
+        PDYm = PDYm_dict[PDYm_key]
+        CDATE = PDYm+run_settings_dict['CYCLE'].zfill(2)
+        for version in ["eagle_solo", "eagle_solo_test"]:
+            if version == "eagle_solo":
+                aws_url = os.path.join(
+                    'https://noaa-nws-graphcastgfs-pds.s3.amazonaws.com',
+                    f"aigfs.{PDYm}", CDATE[-2:], "model", "atmos", "grib2"
+                )
+            elif version == "eagle_solo_test":
+                aws_url = os.path.join(
+                    'https://noaa-nws-graphcastgfs-pds.s3.amazonaws.com', "test",
+                    f"aigfs.{PDYm}", CDATE[-2:], "model", "atmos", "grib2"
+                )
+            model_run_dir = os.path.join(base_model_run_dir, version, CDATE)
+            if not os.path.exists(model_run_dir):
+                print("Making directory "+model_run_dir)
+                os.makedirs(model_run_dir)
+            os.chdir(model_run_dir)
+            print("In run directory: "+model_run_dir)
+            version_model_archive_dir = os.path.join(
+                model_archive_dir, f"{version}",
+                f"{version}.{PDYm}", CDATE[-2:]
+            )
+            if not os.path.exists(version_model_archive_dir):
+                print("Making directory "+version_model_archive_dir)
+                os.makedirs(version_model_archive_dir)
+            # Set AWS URL for date and cycle
+            fhr = int(run_settings_dict['FHR_MIN'])
+            while fhr <= int(run_settings_dict['FHR_MAX']):
+                fhr3 = str(fhr).zfill(3)
+                source_pres_file = os.path.join(
+                    aws_url,
+                    f"aigfs.t{CDATE[-2:]}z.pres.f{fhr3}.grib2"
+                )
+                source_sfc_file = os.path.join(
+                    aws_url,
+                    f"aigfs.t{CDATE[-2:]}z.sfc.f{fhr3}.grib2"
+                )
+                tmp_file = os.path.join(
+                    model_run_dir, 'tmp.'
+                    +f"aigfs.t{CDATE[-2:]}z.f{fhr3}.grib2"
+                )
+                archive_file = os.path.join(
+                    version_model_archive_dir,
+                    f"aigfs.t{CDATE[-2:]}z.f{fhr3}.grib2"
+                )
+                if not ega_util.check_file(archive_file):
+                    for source_file in [source_pres_file, source_sfc_file]:
+                        print(f"Downloading {source_file}")
+                        run_wget = subprocess.run(
+                            ['wget', source_file], capture_output=True
+                        )
+                        if int(run_wget.returncode) != 0:
+                            print(run_wget)
+                    if ega_util.check_file(source_pres_file.rpartition("/")[2]) \
+                            and ega_util.check_file(source_sfc_file.rpartition("/")[2]):
+                        ega_util.run_shell_command(
+                            ["cat", source_pres_file.rpartition("/")[2],
+                             source_sfc_file.rpartition("/")[2], ">", tmp_file]
+                        )
+                    if ega_util.check_file(tmp_file):
+                        ega_util.copy_file(tmp_file, archive_file)
+                fhr+=int(run_settings_dict['FHR_INC'])
 elif run_settings_dict['MODEL'] == 'graphcastgfs':
     for PDYm_key in list(PDYm_dict.keys()):
         PDYm = PDYm_dict[PDYm_key]

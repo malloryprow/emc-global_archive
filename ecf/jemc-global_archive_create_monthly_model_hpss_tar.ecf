@@ -40,7 +40,7 @@ export KEEPDATA=NO
 export TAR_YYYY=$(date -d "1 month ago" '+%Y')
 export TAR_mm=$(date -d "1 month ago" '+%m')
 
-export model_list="gfs cmc fno ukm ecm cdas jma cfsr ncmrwf ecmg4"
+export model_list="gfs ecm ecmg4"
 
 $HOMEemc_global_archive/jobs/JEMC_GLOBAL_ARCHIVE_CREATE_MONTHLY_MODEL_HPSS_TAR
 ######################################################################

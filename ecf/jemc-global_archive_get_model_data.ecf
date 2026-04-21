@@ -43,7 +43,7 @@ export KEEPDATA=YES
 
 export IDATE=$(date '+%Y%m%d')
 
-export model_list="gfs cmc fno ukm ecm jma cfsr cdas ncmrwf ecmg4"
+export model_list="gfs ecm ecmg4"
 
 $HOMEemc_global_archive/jobs/JEMC_GLOBAL_ARCHIVE_GET_MODEL_DATA
 ######################################################################

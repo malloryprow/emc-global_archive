@@ -144,14 +144,14 @@ obs_hpss_dir = os.path.join(
 ega_util.run_shell_command(
     ['hsi', '"mkdir -p '+obs_hpss_dir+'"']
 )
-if run_settings_dict['OBS'] in ['prepbufr_gdas', 'prepbufr_nam', 'prepbufr_rap']:
+if run_settings_dict['OBS'] in ['prepbufr_gdas', 'prepbufr_nam', 'prepbufr_rap', 'prepbufr_rrfs']:
     ega_util.run_shell_command(
         ['hsi', '"chmod 750 '+obs_hpss_dir+'"']
     )
     ega_util.run_shell_command(
         ['hsi', '"chgrp rstprod '+obs_hpss_dir+'"']
     )
-if run_settings_dict['OBS'] in ['prepbufr_gdas', 'prepbufr_nam', 'prepbufr_rap']:
+if run_settings_dict['OBS'] in ['prepbufr_gdas', 'prepbufr_nam', 'prepbufr_rap', 'prepbufr_rrfs']:
     obs_archive_dir = os.path.join(
         run_settings_dict['ARCHIVE_DIR'],
         run_settings_dict['OBS'].partition('_')[0],
@@ -241,7 +241,7 @@ else:
              '*'+run_settings_dict['YEARMON']+'*']
         )
         if run_settings_dict['OBS'] in ['prepbufr_gdas', 'prepbufr_nam',
-                                        'prepbufr_rap']:
+                                        'prepbufr_rap', 'prepbufr_rrfs']:
             ega_util.run_shell_command(
                 ['hsi', '"chmod 750 '
                  +os.path.join(obs_hpss_dir, run_settings_dict['OBS']+'_'

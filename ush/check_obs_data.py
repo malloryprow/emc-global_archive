@@ -136,7 +136,7 @@ for run_name in list(run_settings_dict.keys()):
 print("")
 
 # Check obs data
-if run_settings_dict['OBS'] in ['prepbufr_gdas', 'prepbufr_nam', 'prepbufr_rap']:
+if run_settings_dict['OBS'] in ['prepbufr_gdas', 'prepbufr_nam', 'prepbufr_rap', 'prepbufr_rrfs']:
     obs_archive_dir = os.path.join(
         run_settings_dict['ARCHIVE_DIR'],
         run_settings_dict['OBS'].split('_')[0],
@@ -187,30 +187,31 @@ if os.path.exists(obs_archive_dir):
         check_file_list.append(
             'nam.'+run_settings_dict['PDY']+'/nam.t18z.prepbufr.tm03'
         )
-    elif run_settings_dict['OBS'] == 'prepbufr_rap':
+    elif run_settings_dict['OBS'] in ['prepbufr_rap', 'prepbufr_rrfs']:
+        mod_pb = run_settings_dict['OBS'].split("_")[1]
         check_file_list.append(
-            'rap.'+run_settings_dict['PDY']+'/rap.t00z.prepbufr.tm00'
+            mod_pb+'.'+run_settings_dict['PDY']+'/'+mod_pb+'.t00z.prepbufr.tm00'
         )
         check_file_list.append(
-            'rap.'+run_settings_dict['PDY']+'/rap.t03z.prepbufr.tm00'
+            mod_pb+'.'+run_settings_dict['PDY']+'/'+mod_pb+'.t03z.prepbufr.tm00'
         )
         check_file_list.append(
-            'rap.'+run_settings_dict['PDY']+'/rap.t06z.prepbufr.tm00'
+            mod_pb+'.'+run_settings_dict['PDY']+'/'+mod_pb+'.t06z.prepbufr.tm00'
         )
         check_file_list.append(
-            'rap.'+run_settings_dict['PDY']+'/rap.t09z.prepbufr.tm00'
+            mod_pb+'.'+run_settings_dict['PDY']+'/'+mod_pb+'.t09z.prepbufr.tm00'
         )
         check_file_list.append(
-            'rap.'+run_settings_dict['PDY']+'/rap.t12z.prepbufr.tm00'
+            mod_pb+'.'+run_settings_dict['PDY']+'/'+mod_pb+'.t12z.prepbufr.tm00'
         )
         check_file_list.append(
-            'rap.'+run_settings_dict['PDY']+'/rap.t15z.prepbufr.tm00'
+            mod_pb+'.'+run_settings_dict['PDY']+'/'+mod_pb+'.t15z.prepbufr.tm00'
         )
         check_file_list.append(
-            'rap.'+run_settings_dict['PDY']+'/rap.t18z.prepbufr.tm00'
+            mod_pb+'.'+run_settings_dict['PDY']+'/'+mod_pb+'.t18z.prepbufr.tm00'
         )
         check_file_list.append(
-            'rap.'+run_settings_dict['PDY']+'/rap.t21z.prepbufr.tm00'
+            mod_pb+'.'+run_settings_dict['PDY']+'/'+mod_pb+'.t21z.prepbufr.tm00'
         )
     elif run_settings_dict['OBS'] == 'ccpa_accum24hr':
         check_file_list.append('ccpa.'+run_settings_dict['PDY']+'12.24h')

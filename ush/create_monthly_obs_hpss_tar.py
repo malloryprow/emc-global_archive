@@ -220,7 +220,7 @@ else:
         )
     elif run_settings_dict['OBS'] == 'ndbc_buoy':
         YEARMON_file_list = glob.glob(
-            'buoy_'+run_settings_dict['YEARMON']+'*'
+            run_settings_dict['YEARMON']+'*'
         )
     elif run_settings_dict['OBS'] == 'jason3':
         YEARMON_file_list = glob.glob(

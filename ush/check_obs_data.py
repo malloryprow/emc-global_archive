@@ -229,6 +229,23 @@ if os.path.exists(obs_archive_dir):
         for hem in ['nh', 'sh']:
             check_file_list.append('ice_conc_+'hem'+_polstere-100_multi_'
                                    +PDYm1_dt.strftime('%Y%m%d')+'1200.nc')
+    elif run_settings_dict['OBS'] == 'ndbc_buoy':
+        check_dir = os.path.join(
+            obs_archive_dir, PDY_dt.strftime('%Y%m%d')
+        )
+        nfiles = len(os.listdir(check_dir))
+        if nfiles == 0:
+            missing_files_txt = os.path.join(
+                run_dir, 'missing_files_obs_'+run_settings_dict['OBS']+'_'
+                +run_settings_dict['PDY']+'.txt'
+            )
+            print("\nWriting missing files to "+missing_files_txt)
+            if os.path.exists(missing_files_txt):
+                os.remove(missing_files_txt)
+            with open(missing_files_txt, 'w') as f:
+                f.write("No files in "+check_dir)
+    elif run_settings_dict['OBS'] == 'jason3':
+        check_file_list.append("jason3_b031_xx124_"+PDY_dt.strftime('%Y%m%d'))
     elif run_settings_dict['OBS'] == 'ghrsst_ospo':
         check_file_list.append(PDY_dt.strftime('%Y%m%d')+'_OSPO_L4_GHRSST.nc')
     elif run_settings_dict['OBS'] == 'OBSPRCP':

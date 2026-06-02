@@ -163,13 +163,8 @@ env_var_dict = {
     'WGRIB2': '/apps/ops/prod/libs/intel/19.1.3.304/wgrib2/2.0.8/bin/wgrib2',
     'CNVGRIB': ('/apps/ops/prod/libs/intel/19.1.3.304/grib_util/1.2.3/bin/'
                 +'cnvgrib'),
-    'cdas_ver': 'v1.2',
-    'cmc_ver': 'v1.2',
-    'cfs_ver': 'v2.3',
     'ens_tracker_ver': 'v1.3',
-    'gefs_ver': 'v12.3',
     'gfs_ver': 'v16.3',
-    'naefs_ver': 'v6.1',
     'HOMEemc_global_archive': os.path.join(os.getcwd(), '..'),
     'SENDARCH': 'YES'
 }
@@ -453,11 +448,17 @@ elif run_settings_dict['MODEL'] == 'gfs':
             )
             source_file = os.path.join(
                 model_prod_path, 'gfs.t'+run_settings_dict['CYCLE'].zfill(2)
-                +'z.pgrb2.1p00.f'+fhr3
+                +'z.pgrb2.0p25.f'+fhr3
             )
             if not ega_util.check_file(archive_file):
+                if ega_util.check_file(source_file):
+                    ega_util.run_shell_command(
+                        [os.path.join(run_settings_dict['HOMEemc_global_archive'],
+                                      'ush', 'gfsregrid.sh'),
+                         source_file, run_file]
+                    )
                 if run_settings_dict['SENDARCH'] == 'YES':
-                    ega_util.copy_file(source_file, archive_file)
+                    ega_util.copy_file(run_file, archive_file)
                     ega_util.check_file(archive_file)
             if fhr <= 240:
                 run_file = os.path.join(
@@ -494,11 +495,17 @@ elif run_settings_dict['MODEL'] == 'gfs':
         )
         source_file = os.path.join(
             model_prod_path, 'gfs.t'+run_settings_dict['CYCLE'].zfill(2)
-            +'z.pgrb2.1p00.anl'
+            +'z.pgrb2.0p25.anl'
         )
         if not ega_util.check_file(archive_file):
+            if ega_util.check_file(source_file):
+                ega_util.run_shell_command(
+                    [os.path.join(run_settings_dict['HOMEemc_global_archive'],
+                                  'ush', 'gfsregrid.sh'),
+                     source_file, run_file]
+                )
             if run_settings_dict['SENDARCH'] == 'YES':
-                ega_util.copy_file(source_file, archive_file)
+                ega_util.copy_file(run_file, archive_file)
                 ega_util.check_file(archive_file)
         for fs in ['anl', 'f000', 'f006']:
             source_file = os.path.join(
@@ -506,7 +513,7 @@ elif run_settings_dict['MODEL'] == 'gfs':
                 run_settings_dict['gfs_ver'], 'gdas.'+PDYm,
                 run_settings_dict['CYCLE'].zfill(2), 'atmos',
                 'gdas.t'+run_settings_dict['CYCLE'].zfill(2)
-                +'z.pgrb2.1p00.'+fs
+                +'z.pgrb2.0p25.'+fs
             )
             if fs != 'anl':
                 run_file = os.path.join(
@@ -523,8 +530,14 @@ elif run_settings_dict['MODEL'] == 'gfs':
                     model_archive_dir, 'pgb'+fs+'.gdas.'+CDATE+'.grib2'
                 )
             if not ega_util.check_file(archive_file):
+                if ega_util.check_file(source_file):
+                    ega_util.run_shell_command(
+                        [os.path.join(run_settings_dict['HOMEemc_global_archive'],
+                                      'ush', 'gfsregrid.sh'),
+                         source_file, run_file]
+                    )
                 if run_settings_dict['SENDARCH'] == 'YES':
-                    ega_util.copy_file(source_file, archive_file)
+                    ega_util.copy_file(run_file, archive_file)
                     ega_util.check_file(archive_file)
         source_file = os.path.join(
             run_settings_dict['COMROOT'], 'ens_tracker',

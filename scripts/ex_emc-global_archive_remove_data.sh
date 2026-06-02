@@ -7,18 +7,10 @@ set -x
 
 # Remove model data
 for model in $model_list; do
-    if [ $model = "cdas" ];   then rm_back_hr=2184;  fi
-    if [ $model = "cfsr" ];   then rm_back_hr=2184;  fi
-    if [ $model = "cmc" ];    then rm_back_hr=2184;  fi
-    if [ $model = "ecm" ];    then rm_back_hr=8088;  fi
-    if [ $model = "ecmg4" ];  then rm_back_hr=2184;  fi
-    if [ $model = "fno" ];    then rm_back_hr=2184;  fi
-    if [ $model = "gfs" ];    then rm_back_hr=17616; fi
-    if [ $model = "gefsc" ];  then rm_back_hr=2184;  fi
-    if [ $model = "gefsm" ];  then rm_back_hr=2184;  fi
-    if [ $model = "jma" ];    then rm_back_hr=2184;  fi
-    if [ $model = "ncmrwf" ]; then rm_back_hr=2184;  fi
-    if [ $model = "ukm" ];    then rm_back_hr=2184;  fi
+    if [ $model = "ecm" ];           then rm_back_hr=8088;  fi
+    if [ $model = "ecmg4" ];         then rm_back_hr=2184;  fi
+    if [ $model = "gfs" ];           then rm_back_hr=17616; fi
+    if [ $model = "eagle_solo" ];    then rm_back_hr=8088;  fi
     cd $DATA
     rCDATE=`$NDATE -$rm_back_hr ${PDY}00`
     rPDY=`echo $rCDATE |cut -c 1-8`

@@ -424,14 +424,18 @@ elif run_settings_dict['MODEL'] == 'gfs':
             )
             source_file = os.path.join(
                 model_prod_path, 'gfs.t'+run_settings_dict['CYCLE'].zfill(2)
-                +'z.pgrb2.1p00.f'+fhr3
+                +'z.pgrb2.0p25.f'+fhr3
             )
             tmp_file = os.path.join(
                 model_run_dir, 'tmp.pgrb2.1p00.gfs.f'+fhr3+'.'+CDATE
             )
             if not ega_util.check_file(archive_file):
-                if not ega_util.check_file(tmp_file):
-                    ega_util.copy_file(source_file, tmp_file)
+                if ega_util.check_file(source_file):
+                    ega_util.run_shell_command(
+                        [os.path.join(run_settings_dict['HOMEemc_global_archive'],
+                                      'ush', 'gfsregrid.sh'),
+                         source_file, tmp_file]
+                    )
                 if ega_util.check_file(tmp_file):
                     ega_util.convert_grib2_to_grib1(
                         tmp_file, run_file,
@@ -490,14 +494,18 @@ elif run_settings_dict['MODEL'] == 'gfs':
         )
         source_file = os.path.join(
             model_prod_path, 'gfs.t'+run_settings_dict['CYCLE'].zfill(2)
-            +'z.pgrb2.1p00.anl'
+            +'z.pgrb2.0p25.anl'
         )
         tmp_file = os.path.join(
             model_run_dir, 'tmp.pgrb2.1p00.gfs.anl.'+CDATE
         )
         if not ega_util.check_file(archive_file):
-            if not ega_util.check_file(tmp_file):
-                ega_util.copy_file(source_file, tmp_file)
+            if ega_util.check_file(source_file):
+                ega_util.run_shell_command(
+                    [os.path.join(run_settings_dict['HOMEemc_global_archive'],
+                                  'ush', 'gfsregrid.sh'),
+                     source_file, tmp_file]
+                )
             if ega_util.check_file(tmp_file):
                 ega_util.convert_grib2_to_grib1(
                     tmp_file, run_file,
@@ -512,7 +520,7 @@ elif run_settings_dict['MODEL'] == 'gfs':
                 run_settings_dict['gfs_ver'], 'gdas.'+PDYm,
                 run_settings_dict['CYCLE'].zfill(2), 'atmos',
                 'gdas.t'+run_settings_dict['CYCLE'].zfill(2)
-                +'z.pgrb2.1p00.'+fs
+                +'z.pgrb2.0p25.'+fs
             )
             if fs != 'anl':
                 run_file = os.path.join(
@@ -532,8 +540,12 @@ elif run_settings_dict['MODEL'] == 'gfs':
                 model_run_dir, 'tmp.pgrb2.1p00.gdas.'+fs+'.'+CDATE
             )
             if not ega_util.check_file(archive_file):
-                if not ega_util.check_file(tmp_file):
-                    ega_util.copy_file(source_file, tmp_file)
+                if ega_util.check_file(source_file):
+                    ega_util.run_shell_command(
+                        [os.path.join(run_settings_dict['HOMEemc_global_archive'],
+                                      'ush', 'gfsregrid.sh'),
+                         source_file, tmp_file]
+                    )
                 if ega_util.check_file(tmp_file):
                     ega_util.convert_grib2_to_grib1(
                         tmp_file, run_file,

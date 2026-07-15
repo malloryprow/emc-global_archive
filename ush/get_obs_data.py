@@ -9,7 +9,7 @@ Author(s):
 	Mallory Row (mallory.row@noaa.gov)
 History Log:
         November 2021 - Inital version
-Command Line Agruments: 
+Command Line Agruments:
         --date: optional, date (format YYYYmmdd) to run for,
                 default: today
         --archdir: path to archive directory,
@@ -98,6 +98,8 @@ run_settings_dict['prepbufr_nam_cycle_list'] = ['00', '06', '12', '18']
 run_settings_dict['prepbufr_nam_suffix_list'] = ['tm00', 'tm03']
 run_settings_dict['prepbufr_rap_cycle_list'] = ['00', '03', '06', '09',
                                                 '12', '15', '18', '21']
+run_settings_dict['prepbufr_rrfs_cycle_list'] = ['00', '03', '06', '09',
+                                                 '12', '15', '18', '21']
 run_settings_dict['ccpa_accum6hr_valid_hr_list'] = ['00', '06', '12', '18']
 run_settings_dict['nesdis_get_d_ftp'] = 'ftp://ftp.star.nesdis.noaa.gov'
 run_settings_dict['nesdis_get_d_ftp_dir'] = ('pub/smcd/emb/lfang/'
@@ -169,7 +171,7 @@ wcoss2_dict = ega_util.get_machine_dict()
 
 # Make archive directory
 if run_settings_dict['OBS'] in ['prepbufr_gdas', 'prepbufr_nam',
-                                'prepbufr_rap']:
+                                'prepbufr_rap', 'prepbufr_rrfs']:
     obs_archive_dir = os.path.join(
         run_settings_dict['ARCHIVE_DIR'],
         run_settings_dict['OBS'].partition('_')[0],
@@ -184,7 +186,7 @@ if run_settings_dict['SENDARCH'] == 'YES':
         print("Making directory "+obs_archive_dir)
         os.makedirs(obs_archive_dir)
         if run_settings_dict['OBS'] in ['prepbufr_gdas', 'prepbufr_nam',
-                                        'prepbufr_rap']:
+                                        'prepbufr_rap', 'prepbufr_rrfs']:
             ega_util.set_rstprod_permissions(obs_archive_dir)
 base_obs_run_dir = os.path.join(
     run_settings_dict['RUN_DIR'], run_settings_dict['OBS']
@@ -302,6 +304,42 @@ elif run_settings_dict['OBS'] == 'prepbufr_rap':
             )
             source_file = os.path.join(
                 rap_prod_dir, 'rap.'+PDYm, 'rap.t'+cyc+'z.prepbufr.tm00'
+            )
+            if not ega_util.check_file(archive_file):
+                ega_util.copy_file(source_file, run_file)
+                if run_settings_dict['SENDARCH'] == 'YES':
+                    ega_util.copy_file(run_file, archive_file)
+                    if ega_util.check_file(archive_file):
+                        ega_util.set_rstprod_permissions(archive_file)
+# prepbufr_rrfs - Operational RRFS prepbufr files
+elif run_settings_dict['OBS'] == 'prepbufr_rrfs':
+    rrfs_prod_dir = os.path.join(
+        run_settings_dict['COMROOT'], 'obsproc', run_settings_dict['obsproc_ver']
+    )
+    for PDYm_key in list(PDYm_dict.keys()):
+        PDYm = PDYm_dict[PDYm_key]
+        obs_archive_PDYm_dir = os.path.join(obs_archive_dir, 'rrfs.'+PDYm)
+        if run_settings_dict['SENDARCH'] == 'YES':
+            if not os.path.exists(obs_archive_PDYm_dir):
+                print("Making directory "+obs_archive_PDYm_dir)
+                os.makedirs(obs_archive_PDYm_dir)
+                ega_util.set_rstprod_permissions(obs_archive_PDYm_dir)
+        obs_run_dir = os.path.join(base_obs_run_dir, PDYm)
+        if not os.path.exists(obs_run_dir):
+            print("Making directory "+obs_run_dir)
+            os.makedirs(obs_run_dir)
+            ega_util.set_rstprod_permissions(obs_run_dir)
+        os.chdir(obs_run_dir)
+        print("In run directory: "+obs_run_dir)
+        for cyc in run_settings_dict['prepbufr_rrfs_cycle_list']:
+            run_file = os.path.join(
+                obs_run_dir, 'rrfs.t'+cyc+'z.prepbufr.tm00'
+            )
+            archive_file = os.path.join(
+                obs_archive_PDYm_dir, 'rrfs.t'+cyc+'z.prepbufr.tm00'
+            )
+            source_file = os.path.join(
+                rrfs_prod_dir, 'rrfs.'+PDYm, 'rrfs.t'+cyc+'z.prepbufr.tm00'
             )
             if not ega_util.check_file(archive_file):
                 ega_util.copy_file(source_file, run_file)
@@ -536,6 +574,8 @@ elif run_settings_dict['OBS']  == 'ndbc_buoy':
         run_settings_dict['DCOMROOT']
     )
     for PDYm_key in list(PDYm_dict.keys()):
+        if PDYm_key == "PDYm0":
+            continue
         PDYm = PDYm_dict[PDYm_key]
         obs_run_dir = os.path.join(base_obs_run_dir, PDYm)
         if not os.path.exists(obs_run_dir):
@@ -547,27 +587,28 @@ elif run_settings_dict['OBS']  == 'ndbc_buoy':
                                   PDYm_dt.strftime('%Y%m%d'),
                                   'validation_data', 'marine',
                                   'buoy')
-        run_file = os.path.join(obs_run_dir,
-                                f"buoy_{PDYm_dt:%Y%m%d}.tar")
-        archive_file = os.path.join(obs_archive_dir,
-                                    f"buoy_{PDYm_dt:%Y%m%d}.tar")
-        if not ega_util.check_file(archive_file):
-            if len(glob.glob(prod_files+'/*')) != 0:
-                ega_util.run_shell_command(
-                    ['tar', '-cvf', run_file, '-C', prod_files, '.']
-                )
-                if ega_util.check_file(run_file):
-                    if run_settings_dict['SENDARCH'] == 'YES':
-                        ega_util.copy_file(run_file, archive_file)
-                        ega_util.check_file(archive_file)
-            else:
-                print(f"No files matching {prod_files}/*")
+        archive_PDYm_dir = os.path.join(obs_archive_dir,
+                                        PDYm_dt.strftime('%Y%m%d'))
+        if not os.path.exists(archive_PDYm_dir):
+            print("Making directory "+archive_PDYm_dir)
+            os.makedirs(archive_PDYm_dir)
+        if len(glob.glob(prod_files+'/*')) != 0:
+            if run_settings_dict['SENDARCH'] == 'YES':
+                for prod_file in glob.glob(prod_files+'/*'):
+                    archive_file = os.path.join(archive_PDYm_dir,
+                                                prod_file.rpartition("/")[2])
+                    if not os.path.exists(archive_file):
+                        ega_util.copy_file(prod_file, archive_file)
+        else:
+            print(f"No files matching {prod_files}/*")
 # JASON3 - satellite altimetry
 elif run_settings_dict['OBS']  == 'jason3':
     jason3_prod_dir = os.path.join(
         run_settings_dict['DCOMROOT']
     )
     for PDYm_key in list(PDYm_dict.keys()):
+        if PDYm_key == "PDYm0":
+            continue
         PDYm = PDYm_dict[PDYm_key]
         obs_run_dir = os.path.join(base_obs_run_dir, PDYm)
         if not os.path.exists(obs_run_dir):
@@ -614,7 +655,7 @@ elif run_settings_dict['OBS'] == 'OBSPRCP':
                 ['mv', ftp_file, run_file]
             )
             #ega_util.run_shell_command(
-            #    ['lftp', '-c', 
+            #    ['lftp', '-c',
             #     'open '+run_settings_dict['cpc_rain_gauge_ftp']+'; '
             #     +'cd '+run_settings_dict['cpc_rain_gauge_ftp_dir']+'; '
             #     +'get '+ftp_file+' -o '+archive_file]

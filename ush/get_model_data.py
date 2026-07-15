@@ -421,6 +421,7 @@ elif run_settings_dict['MODEL'] == 'ecmg4':
                     if ega_util.check_file(archive_file):
                         ega_util.set_rstprod_permissions(archive_file)
             fhr+=int(run_settings_dict['FHR_INC'])
+# gfs - Operational GFS
 elif run_settings_dict['MODEL'] == 'gfs':
     for PDYm_key in list(PDYm_dict.keys()):
         PDYm = PDYm_dict[PDYm_key]
@@ -556,6 +557,7 @@ elif run_settings_dict['MODEL'] == 'gfs':
             if run_settings_dict['SENDARCH'] == 'YES':
                 ega_util.copy_file(source_file, archive_file)
                 ega_util.check_file(archive_file)
+# eagle_solo - Test versions of AIGFS
 elif run_settings_dict['MODEL'] == 'eagle_solo':
     for PDYm_key in list(PDYm_dict.keys()):
         PDYm = PDYm_dict[PDYm_key]

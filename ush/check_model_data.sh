@@ -32,11 +32,11 @@ module load intel/${intel_ver}
 module load python/${python_ver}
 
 # Run
-for model in gfs graphcastgfs ecm ecmg4; do
-    if [ $model = "ecm" ];          then fhrmin=0; fhrmax=240; fhrinc=12; fi
-    if [ $model = "ecmg4" ];        then fhrmin=0; fhrmax=240; fhrinc=6;  fi
-    if [ $model = "gfs" ];          then fhrmin=0; fhrmax=384; fhrinc=3;  fi
-    if [ $model = "graphcastgfs" ]; then fhrmin=0; fhrmax=384; fhrinc=3;  fi
+for model in gfs ecm ecmg4 eagle_solo; do
+    if [ $model = "ecm" ];           then fhrmin=0; fhrmax=240; fhrinc=12; fi
+    if [ $model = "ecmg4" ];         then fhrmin=0; fhrmax=240; fhrinc=6;  fi
+    if [ $model = "gfs" ];           then fhrmin=0; fhrmax=384; fhrinc=3;  fi
+    if [ $model = "eagle_solo" ];    then fhrmin=0; fhrmax=384; fhrinc=6; fi
     if [ $model = "ecm" ]; then
         if [ $cyc = "06" ] -o [ $cyc = "18" ]; then
             fhrmax=0

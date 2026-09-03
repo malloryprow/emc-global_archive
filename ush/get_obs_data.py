@@ -488,28 +488,30 @@ elif run_settings_dict['OBS'] == 'osi_saf':
             os.makedirs(obs_run_dir)
         os.chdir(obs_run_dir)
         print("In run directory: "+obs_run_dir)
-        # Daily NH and SH files
-        for hem in ['nh', 'sh']:
-            daily_hem_run_file = os.path.join(
-                obs_run_dir, 'ice_conc_'+hem+'_polstere-100_multi_'
-                +PDYm_dt.strftime('%Y%m%d')+'1200.nc'
-            )
-            daily_hem_archive_file = os.path.join(
-                obs_archive_dir, 'ice_conc_'+hem+'_polstere-100_multi_'
-                +PDYm_dt.strftime('%Y%m%d')+'1200.nc'
-            )
-            if not ega_util.check_file(daily_hem_archive_file):
-                source_hem_file = os.path.join(
-                    osi_saf_prod_dir, PDYm_dt.strftime('%Y%m%d'),
-                    'seaice', 'osisaf',
-                    'ice_conc_'+hem+'_polstere-100_multi_'
+        # Sources multi and amsr3
+        for source_type in ['multi', 'amsr3']:
+            # Daily NH and SH files
+            for hem in ['nh', 'sh']:
+                daily_hem_run_file = os.path.join(
+                    obs_run_dir, 'ice_conc_'+hem+'_polstere-100_'+source_type+'_'
                     +PDYm_dt.strftime('%Y%m%d')+'1200.nc'
                 )
-                if not ega_util.check_file(daily_hem_run_file):
-                    ega_util.copy_file(source_hem_file, daily_hem_run_file)
-                if ega_util.check_file(daily_hem_run_file):
-                    if run_settings_dict['SENDARCH'] == 'YES':
-                        ega_util.copy_file(daily_hem_run_file, daily_hem_archive_file)
+                daily_hem_archive_file = os.path.join(
+                    obs_archive_dir, 'ice_conc_'+hem+'_polstere-100_'+source_type+'_'
+                    +PDYm_dt.strftime('%Y%m%d')+'1200.nc'
+                )
+                if not ega_util.check_file(daily_hem_archive_file):
+                    source_hem_file = os.path.join(
+                        osi_saf_prod_dir, PDYm_dt.strftime('%Y%m%d'),
+                        'seaice', 'osisaf',
+                        'ice_conc_'+hem+'_polstere-100_'+source_type+'_'
+                        +PDYm_dt.strftime('%Y%m%d')+'1200.nc'
+                    )
+                    if not ega_util.check_file(daily_hem_run_file):
+                        ega_util.copy_file(source_hem_file, daily_hem_run_file)
+                    if ega_util.check_file(daily_hem_run_file):
+                        if run_settings_dict['SENDARCH'] == 'YES':
+                            ega_util.copy_file(daily_hem_run_file, daily_hem_archive_file)
 # get_d - NESDIS GET_D Flux files
 elif run_settings_dict['OBS']  == 'get_d':
     for PDYm_key in list(PDYm_dict.keys()):

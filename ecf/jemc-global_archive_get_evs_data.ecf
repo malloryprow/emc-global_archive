@@ -37,7 +37,7 @@ export KEEPDATA=YES
 
 export VDATE=$(date -d '1 day ago' +%Y%m%d)
 
-export evs_model_list="cfs cmc ecmwf fnmoc gfs ukmet"
+export evs_component_list="global_det global_ens"
 
 $HOMEemc_global_archive/jobs/JEMC_GLOBAL_ARCHIVE_GET_EVS_DATA
 ######################################################################

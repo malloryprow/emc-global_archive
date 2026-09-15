@@ -55,7 +55,7 @@ export SENDARCH=${SENDARCH:-YES}
 ####################################
 # Define model variables
 ####################################
-export evs_model_list=${evs_model_list:-"gfs"}
+export evs_component_list=${evs_component_list:-"global_det"}
 
 ####################################
 # Define COMIN/ARCHOUT variables

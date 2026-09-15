@@ -12,8 +12,8 @@ Command Line Agruments:
                    default: /lfs/h2/emc/vpppg/noscrub/$USER/evs_archive
         --rundir: optional, path to run directory,
                   default: /lfs/h2/emc/stmp/$USER/run_get_evs_data
-        --model: optional, model name
-                 default: fnl
+        --component: optional, component name
+                     default: global_det
 Input Files:
 Output Files:
 Condition codes: 0 for success, 1 for failure
@@ -42,8 +42,8 @@ def usage():
            +"default: /lfs/h2/emc/vpppg/noscrub/$USER/evs_archive\n"
            +"   --rundir=RUN_DIR        optional, "
            +"default: /lfs/h2/emc/stmp/$USER/run_get_evs_data\n"
-           +"   --model=MODEL           optional, "
-           +"default: gfs\n")
+           +"   --component=COMPONENT           optional, "
+           +"default: global_det\n")
     sys.exit(1)
 
 # Command line agrument information
@@ -62,9 +62,9 @@ cmd_line_args_dict = {
         'default': ('/lfs/h2/emc/stmp/'+os.environ['USER']
                     +'/run_get_evs_data')
     },
-    '--model=': {
-        'run_name': 'MODEL',
-        'default': 'gfs'
+    '--component=': {
+        'run_name': 'COMPONENT',
+        'default': 'global_det'
     }
 }
 
@@ -119,7 +119,7 @@ for cmd_line_arg_name in list(cmd_line_args_dict.keys()):
 print("Environment variable settings...")
 env_var_dict = {
     'COMROOT': '/lfs/h1/ops/prod/com',
-    'evs_ver': 'v1.0',
+    'evs_ver': 'v2.0',
     'SENDARCH': 'YES'
 }
 for env_var_name in list(env_var_dict.keys()):
@@ -148,68 +148,87 @@ wcoss2_dict = ega_util.get_machine_dict()
 # Set EVS prod directory
 evs_prod_dir = os.path.join(
     run_settings_dict['COMROOT'], 'evs', run_settings_dict['evs_ver'],
-    'stats', 'global_det'
+    'stats', run_settings_dict['COMPONENT']
 )
 
 # Make archive directory
-global_det_stats_archive_dir = os.path.join(
-    run_settings_dict['ARCHIVE_DIR'], 'stats', 'global_det'
+component_stats_archive_dir = os.path.join(
+    run_settings_dict['ARCHIVE_DIR'], 'stats', run_settings_dict['COMPONENT']
 )
 if run_settings_dict['SENDARCH'] == 'YES':
     if not os.path.exists(run_settings_dict['ARCHIVE_DIR']):
         print("Making directory "+run_settings_dict['ARCHIVE_DIR'])
         os.makedirs(run_settings_dict['ARCHIVE_DIR'])
-    if not os.path.exists(global_det_stats_archive_dir):
-        print("Making directory "+global_det_stats_archive_dir)
-        os.makedirs(global_det_stats_archive_dir)
-base_model_run_dir = os.path.join(
-    run_settings_dict['RUN_DIR'], run_settings_dict['MODEL']
-)
-if not os.path.exists(base_model_run_dir):
-    print("Making directory "+base_model_run_dir)
-    os.makedirs(base_model_run_dir)
-os.chdir(base_model_run_dir)
-print("In run directory: "+base_model_run_dir)
+    if not os.path.exists(component_stats_archive_dir):
+        print("Making directory "+component_stats_archive_dir)
+        os.makedirs(component_stats_archive_dir)
 
-# Set verif_case for model
-verif_case_list = ['grid2grid', 'grid2obs']
 
-# Get files
-for PDYm_key in list(PDYm_dict.keys()):
-    PDYm = PDYm_dict[PDYm_key]
-    model_run_dir = os.path.join(base_model_run_dir, PDYm)
-    if not os.path.exists(model_run_dir):
-        print("Making directory "+model_run_dir)
-        os.makedirs(model_run_dir)
-    os.chdir(model_run_dir)
-    print("In run directory: "+model_run_dir)
-    for verif_case in verif_case_list:
-        archive_file = os.path.join(
-            global_det_stats_archive_dir,
-            f"{run_settings_dict['MODEL']}.{PDYm}",
-            f"evs.stats.{run_settings_dict['MODEL']}."
-            +f"atmos.{verif_case}.v{PDYm}.stat" 
-        )
-        if not ega_util.check_file(archive_file):
-            source_file = os.path.join(
-                evs_prod_dir,
-                f"{run_settings_dict['MODEL']}.{PDYm}",
-                f"evs.stats.{run_settings_dict['MODEL']}."
-                +f"atmos.{verif_case}.v{PDYm}.stat"
-            )
-            run_file = os.path.join(
-                model_run_dir,
-                f"evs.stats.{run_settings_dict['MODEL']}."
-                +f"atmos.{verif_case}.v{PDYm}.stat"
-            )
-            if ega_util.check_file(source_file):
-                ega_util.copy_file(source_file, run_file)
-                if run_settings_dict['SENDARCH'] == 'YES':
-                    if not os.path.exists(archive_file.rpartition('/')[0]):
-                        print("Making directory "
-                              +archive_file.rpartition('/')[0])
-                        os.makedirs(archive_file.rpartition('/')[0])
-                    ega_util.copy_file(run_file, archive_file)
-                    ega_util.check_file(archive_file)
+
+if run_settings_dict['COMPONENT'] == 'global_det':
+    model_list = ['cfs', 'cmc', 'ecmwf', 'fnmoc', 'gfs', 'ukmet']
+elif run_settings_dict['COMPONENT'] == 'global_ens':
+     model_list = ['gfs','gefs', 'naefs']
+
+for model in model_list:
+    if run_settings_dict['COMPONENT'] == 'global_det':
+        run_list = ['atmos']
+    elif run_settings_dict['COMPONENT'] == 'global_ens':
+        run_list = ['headline']
+        if model == 'gefs':
+            run_list += ['atmos']
+
+    base_model_run_dir = os.path.join(
+        run_settings_dict['RUN_DIR'], model
+    )
+    if not os.path.exists(base_model_run_dir):
+        print("Making directory "+base_model_run_dir)
+        os.makedirs(base_model_run_dir)
+    os.chdir(base_model_run_dir)
+    print("In run directory: "+base_model_run_dir)
+
+    # Get files
+    for run in run_list:
+        verif_case_list = ['grid2grid']
+        if run == 'atmos':
+            verif_case_list += ['grid2obs']
+        if run_settings_dict['COMPONENT'] == 'global_ens' and run == 'atmos':
+            verif_case_list += ['precip']
+        for verif_case in verif_case_list:
+            for PDYm_key in list(PDYm_dict.keys()):
+                PDYm = PDYm_dict[PDYm_key]
+                model_run_dir = os.path.join(base_model_run_dir, PDYm)
+                if not os.path.exists(model_run_dir):
+                    print("Making directory "+model_run_dir)
+                    os.makedirs(model_run_dir)
+                os.chdir(model_run_dir)
+                print("In run directory: "+model_run_dir)
+                archive_file = os.path.join(
+                    component_stats_archive_dir,
+                    f"{model}.{PDYm}",
+                    f"evs.stats.{model}."
+                    +f"{run}.{verif_case}.v{PDYm}.stat"
+                )
+                if not ega_util.check_file(archive_file):
+                    source_file = os.path.join(
+                        evs_prod_dir,
+                        f"{model}.{PDYm}",
+                        f"evs.stats.{model}."
+                        +f"{run}.{verif_case}.v{PDYm}.stat"
+                    )
+                    run_file = os.path.join(
+                        model_run_dir,
+                        f"evs.stats.{model}."
+                        +f"{run}.{verif_case}.v{PDYm}.stat"
+                    )
+                    if ega_util.check_file(source_file):
+                        ega_util.copy_file(source_file, run_file)
+                        if run_settings_dict['SENDARCH'] == 'YES':
+                            if not os.path.exists(archive_file.rpartition('/')[0]):
+                                print("Making directory "
+                                      +archive_file.rpartition('/')[0])
+                                os.makedirs(archive_file.rpartition('/')[0])
+                            ega_util.copy_file(run_file, archive_file)
+                            ega_util.check_file(archive_file)
 
 print("\nEND: "+sys.argv[0]+" at "+str(datetime.datetime.today())+"\n")
